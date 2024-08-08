@@ -24,10 +24,7 @@ class SearchFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextFormField(
+    return TextFormField(
           focusNode: focusNode,
           autofocus: false,
           controller: controller,
@@ -36,8 +33,8 @@ class SearchFormField extends StatelessWidget {
           decoration: InputDecoration(
             hintText: hint,
             contentPadding: EdgeInsets.symmetric(
-              horizontal: 10.w,
-              vertical: 10.h,
+              horizontal: 5.w,
+              vertical: 5.h,
             ),
             prefixIcon: prefixIcon ?? const SizedBox(),
             suffixIcon: suffixIcon ?? const SizedBox(),
@@ -76,8 +73,6 @@ class SearchFormField extends StatelessWidget {
               ),
             ),
           ),
-        ),
-      ],
-    );
+        );
   }
 }

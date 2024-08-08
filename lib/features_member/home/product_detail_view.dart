@@ -44,8 +44,21 @@ class ProductDetailView extends HookWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: ColorUtils.primaryBackgroundColor,
-        title: Text(product.name),
+        backgroundColor: ColorUtils.primaryColor,
+        title: Text('Chi tiết sản phẩm',style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w600
+        ),),
+        centerTitle: true,
+        leading: InkWell(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
+        ),
       ),
       body: isLoading.value
           ? Center(child: CircularProgressIndicator())
@@ -78,9 +91,9 @@ class ProductDetailView extends HookWidget {
                     SizedBox(height: 8.h),
                     Text(
                       product.description,
-                      style: TextStyle(fontSize: 16.sp),
+                      style: TextStyle(fontSize: 16.sp,
+                      fontStyle: FontStyle.italic),
                     ),
-                    SizedBox(height: 16.h),
                     Row(
                       children: [
                         Text('Quantity: ', style: TextStyle(fontSize: 16.sp)),
@@ -101,7 +114,6 @@ class ProductDetailView extends HookWidget {
                         ),
                       ],
                     ),
-                    SizedBox(height: 16.h),
                     DropdownButton<String>(
                       value: selectedSize.value,
                       hint: Text('Select Size'),
@@ -116,7 +128,6 @@ class ProductDetailView extends HookWidget {
                         selectedSize.value = newValue;
                       },
                     ),
-                    SizedBox(height: 16.h),
                     ElevatedButton(
                       onPressed: selectedSize.value != null
                           ? () async {

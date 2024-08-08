@@ -6,6 +6,7 @@ import 'package:ecommerce_flutter/services/product_service.dart';
 import 'package:ecommerce_flutter/services/category_service.dart';
 import 'package:ecommerce_flutter/services/user_service.dart';
 import 'package:ecommerce_flutter/utils/color_utils.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -108,18 +109,18 @@ class HomeView extends HookWidget {
       resizeToAvoidBottomInset: true,
       backgroundColor: ColorUtils.primaryBackgroundColor,
       appBar: AppBar(
-        backgroundColor: ColorUtils.primaryBackgroundColor,
+        backgroundColor: ColorUtils.primaryColor,
         title: Text(
           'Home',
           style: TextStyle(
-            color: ColorUtils.primaryColor,
+            color: ColorUtils.whiteColor,
             fontSize: 24.sp,
             fontWeight: FontWeight.bold,
           ),
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.category),
+            icon: Icon(Icons.category,color: Colors.white,),
             onPressed: () {
               _showCategoryFilterDialog(
                   context, categories.value, selectedCategory);
@@ -155,7 +156,8 @@ class HomeView extends HookWidget {
               ),
             ),
           Expanded(
-            child: ListView.builder(
+            child: ListView.separated(
+              separatorBuilder: (context, index) => const SizedBox(height: 10,),
               itemCount: getFilteredProducts().length,
               itemBuilder: (context, index) {
                 final product = getFilteredProducts()[index];
@@ -170,8 +172,6 @@ class HomeView extends HookWidget {
                     );
                   },
                   child: Container(
-                    margin:
-                        EdgeInsets.symmetric(vertical: 10.h, horizontal: 15.w),
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: ColorUtils.whiteColor,
@@ -193,15 +193,16 @@ class HomeView extends HookWidget {
                           borderRadius: BorderRadius.circular(10),
                           child: Image.network(
                             product.imageUrl,
-                            width: 100.w,
+                            width: 120.w,
                             height: 100.h,
-                            fit: BoxFit.cover,
+                            fit: BoxFit.fill,
                           ),
                         ),
                         SizedBox(width: 10.w),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
                                 product.name,
@@ -209,7 +210,12 @@ class HomeView extends HookWidget {
                                     fontSize: 18.sp,
                                     fontWeight: FontWeight.bold),
                               ),
-                              SizedBox(height: 19),
+                              Text(
+                                product.description,
+                                style: TextStyle(
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.w400),
+                              ),
                               Text(
                                 '${product.price} USD',
                                 style: TextStyle(
@@ -258,7 +264,24 @@ class HomeView extends HookWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Filter by Category'),
+          contentPadding: EdgeInsets.zero,
+          actionsPadding: EdgeInsets.zero,
+          shape: OutlineInputBorder(
+            borderSide: BorderSide.none
+          ),
+          titlePadding: EdgeInsets.zero,
+          title: Container(
+            alignment: Alignment.center,
+            height: 80,
+            decoration: BoxDecoration(
+              color: Colors.green
+            ),
+              child: Text('Filter by Category',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 25,
+            fontWeight: FontWeight.w600
+          ),)),
           content: SingleChildScrollView(
             child: ListBody(
               children: categories.map((category) {
