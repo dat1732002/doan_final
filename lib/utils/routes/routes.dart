@@ -10,7 +10,7 @@ import 'routes_name.dart';
 class Routes {
   static Route<dynamic> routeBuilder(RouteSettings settings) {
     switch (settings.name) {
-      case RoutesName.getStart:
+      case RoutesName.getStarted:
         return MaterialPageRoute(
           builder: (BuildContext context) =>  GetStarted(),
         );

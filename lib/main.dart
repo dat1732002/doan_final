@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
           fontFamily: 'OpenSans',
           useMaterial3: true,
         ),
-        initialRoute: RoutesName.getStart,
+        initialRoute: RoutesName.getStarted,
         onGenerateRoute: Routes.routeBuilder,
       ),
     );

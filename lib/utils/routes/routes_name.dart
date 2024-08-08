@@ -1,6 +1,6 @@
 class RoutesName {
   RoutesName._();
-  static const getStart = '/getStart';
+  static const getStarted = '/getStarted';
   static const signIn = '/signIn';
   static const signUp = '/signUp';
   static const bottomNavigatorMember = '/bottomNavigatorMember';

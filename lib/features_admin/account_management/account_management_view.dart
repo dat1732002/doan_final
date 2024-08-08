@@ -64,7 +64,7 @@ class AccountManagementView extends HookWidget {
       resizeToAvoidBottomInset: true,
       backgroundColor: ColorUtils.primaryBackgroundColor,
       appBar: AppBar(
-        backgroundColor: ColorUtils.blueDartLightColor,
+        backgroundColor: ColorUtils.primaryBackgroundColor,
         title: Text(
           'Account Management',
           style: TextStyle(
@@ -86,15 +86,15 @@ class AccountManagementView extends HookWidget {
         itemBuilder: (context, index) {
           final user = users.value[index];
           return Card(
-            margin: EdgeInsets.symmetric(vertical: 5.h, horizontal: 15.w),
+            margin: EdgeInsets.symmetric(vertical: 10.h, horizontal: 15.w),
             elevation: 5,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
             ),
             child: Container(
-              padding: EdgeInsets.all(10.w),
+              padding: EdgeInsets.all(15.w),
               decoration: BoxDecoration(
-                color: ColorUtils.blueLightColor,
+                color: ColorUtils.blueLightColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(15),
               ),
               child: Row(
@@ -108,7 +108,7 @@ class AccountManagementView extends HookWidget {
                         style: TextStyle(
                           fontSize: 18.sp,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: ColorUtils.primaryColor,
                         ),
                       ),
                       SizedBox(height: 5.h),
@@ -122,7 +122,7 @@ class AccountManagementView extends HookWidget {
                     ],
                   ),
                   IconButton(
-                    icon: Icon(Icons.edit, color: ColorUtils.blueColor),
+                    icon: Icon(Icons.edit, color: ColorUtils.primaryColor),
                     onPressed: () {
                       _showEditUserDialog(
                         context,

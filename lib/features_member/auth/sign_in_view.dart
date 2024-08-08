@@ -77,13 +77,13 @@ class _SignInViewState extends State<SignInView> {
           child: Form(
             key: _formKey,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Log In Now',
+                  'Welcome back to Ecommerce',
                   style: TextStyle(
                       color: ColorUtils.primaryColor,
-                      fontSize: 25.sp,
+                      fontSize: 20.sp,
                       fontWeight: FontWeight.bold),
                 ),
                 Text(
@@ -94,7 +94,10 @@ class _SignInViewState extends State<SignInView> {
                   ),
                 ),
                 SizedBox(
-                  height: 30.h,
+                  height: 10.h,
+                ),
+                SizedBox(
+                  height: 20.h,
                 ),
                 TextFormFieldCustomWidget(
                   hint: 'Your email address',

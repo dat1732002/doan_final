@@ -29,7 +29,7 @@ class SearchFormField extends StatelessWidget {
       children: [
         TextFormField(
           focusNode: focusNode,
-          autofocus: true,
+          autofocus: false,
           controller: controller,
           onChanged: onChanged,
           textInputAction: inputAction,

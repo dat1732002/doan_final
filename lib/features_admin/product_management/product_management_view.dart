@@ -304,9 +304,6 @@ class ProductManagementView extends HookWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.zero,
-          ),
           title: Text(product == null ? 'Add Product' : 'Edit Product'),
           content: SingleChildScrollView(
             child: Column(
@@ -424,122 +421,82 @@ class ProductManagementView extends HookWidget {
       builder: (BuildContext context) {
         return SingleChildScrollView(
           child: AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero,
-            ),
-            contentPadding: EdgeInsets.all(10),
-            backgroundColor: Colors.white,
-            title: Center(child: Text('Manage Categories')),
-            titleTextStyle: TextStyle(
-              fontWeight: FontWeight.w700,
-              color: Colors.black,
-              fontSize: 20
-            ),
+            title: Text('Manage Categories'),
             content: SizedBox(
               width: double.maxFinite,
               child: Column(
                 children: [
-                  const Divider(),
                   ListView.builder(
                     shrinkWrap: true,
                     itemCount: categories.length,
                     itemBuilder: (context, index) {
                       final category = categories[index];
-                      return Container(
-                        height: 40,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      return ListTile(
+                        title: Text(category.name),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(category.name,style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w600
-                            ),),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                InkWell(
-                                  child: Icon(Icons.edit,color: Colors.grey,),
-                                  onTap: category.isUsed
-                                      ? null
-                                      : () {
-                                          _showEditCategoryDialog(
-                                              context, category, refresh);
-                                        },
-                                ),
-                                const SizedBox(width: 15,),
-                                InkWell(
-                                  child: Icon(Icons.delete,color: Colors.grey,),
-                                  onTap: category.isUsed
-                                      ? null
-                                      : () async {
-                                          try {
-                                            await CategoryService()
-                                                .deleteCategory(category.id);
-                                            categories.removeAt(index);
-                                            categories = List.from(categories);
-                                            Navigator.pop(context);
-                                          } catch (e) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(SnackBar(
-                                              content: Text(e.toString()),
-                                            ));
-                                          }
-                                        },
-                                ),
-                              ],
+                            IconButton(
+                              icon: Icon(Icons.edit),
+                              onPressed: category.isUsed
+                                  ? null
+                                  : () {
+                                      _showEditCategoryDialog(
+                                          context, category, refresh);
+                                    },
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.delete),
+                              onPressed: category.isUsed
+                                  ? null
+                                  : () async {
+                                      try {
+                                        await CategoryService()
+                                            .deleteCategory(category.id);
+                                        categories.removeAt(index);
+                                        categories = List.from(categories);
+                                        Navigator.pop(context);
+                                      } catch (e) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                          content: Text(e.toString()),
+                                        ));
+                                      }
+                                    },
                             ),
                           ],
                         ),
                       );
                     },
                   ),
-                  const SizedBox(height: 10,),
                   TextField(
                     controller: categoryNameController,
-                    decoration: InputDecoration(labelText: 'New Category Name',border: OutlineInputBorder(borderSide: BorderSide(color: Colors.black))),
+                    decoration: InputDecoration(labelText: 'New Category Name'),
                   ),
-                  const SizedBox(height: 10,),
                 ],
               ),
             ),
-            actionsAlignment: MainAxisAlignment.spaceBetween,
             actions: [
-              Container(
-                color: Colors.red,
-                child: TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('Close',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white
-                  ),),
-                ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('Close'),
               ),
-              Container(
-                color: Colors.green,
-                child: TextButton(
-                  onPressed: () async {
-                    final newCategory = CategoryModel(
-                      id: '',
-                      name: categoryNameController.text,
-                      isUsed: false,
-                    );
-                    await CategoryService().createCategory(newCategory);
-                    categories.add(newCategory);
-                    categories = List.from(categories);
-                    refresh.value++;
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('Add Category',style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white
-                  ),),
-                ),
+              TextButton(
+                onPressed: () async {
+                  final newCategory = CategoryModel(
+                    id: '',
+                    name: categoryNameController.text,
+                    isUsed: false,
+                  );
+                  await CategoryService().createCategory(newCategory);
+                  categories.add(newCategory);
+                  categories = List.from(categories);
+                  refresh.value++;
+                  Navigator.of(context).pop();
+                },
+                child: Text('Add Category'),
               ),
             ],
           ),
