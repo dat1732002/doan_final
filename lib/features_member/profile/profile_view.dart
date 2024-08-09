@@ -44,11 +44,11 @@ class ProfileView extends HookWidget {
       resizeToAvoidBottomInset: true,
       backgroundColor: ColorUtils.primaryBackgroundColor,
       appBar: AppBar(
-        backgroundColor: ColorUtils.primaryBackgroundColor,
+        backgroundColor: ColorUtils.primaryColor,
         title: Text(
           'Profile',
           style: TextStyle(
-            color: ColorUtils.primaryColor,
+            color: ColorUtils.whiteColor,
             fontSize: 24.sp,
             fontWeight: FontWeight.bold,
           ),

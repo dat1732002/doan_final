@@ -6,6 +6,7 @@ import 'package:ecommerce_flutter/services/order_service.dart';
 import 'package:ecommerce_flutter/services/user_service.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 
 class OrderView extends HookWidget {
   const OrderView({Key? key}) : super(key: key);
@@ -25,11 +26,13 @@ class OrderView extends HookWidget {
     });
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: ColorUtils.primaryColor,
         title: Text(
           'My Orders',
           style: TextStyle(
-            color: ColorUtils.primaryColor,
+            color: ColorUtils.whiteColor,
             fontSize: 24.sp,
             fontWeight: FontWeight.bold,
           ),
@@ -53,62 +56,62 @@ class OrderView extends HookWidget {
             itemCount: orders.length,
             itemBuilder: (context, index) {
               final order = orders[index];
-              return Container(
-                margin: EdgeInsets.all(8),
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      blurRadius: 5,
-                      offset: Offset(0, 3),
+              return InkWell(
+                onTap: (){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          OrderDetailsView(order: order),
                     ),
-                  ],
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Order #${order.id}',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Text('Status: ${order.status}',
-                              style: TextStyle(
-                                color: order.status.toLowerCase() == 'accepted'
-                                    ? Colors.green
-                                    : Colors.black,
-                              )),
-                          SizedBox(height: 4),
-                          Text('Date: ${order.createdAt.toLocal()}'),
-                          SizedBox(height: 4),
-                          Text(
-                              'Total: ${order.totalAmount.toStringAsFixed(0)}\$'),
-                        ],
+                  );
+                },
+                child: Container(
+                  margin: EdgeInsets.all(8),
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        blurRadius: 5,
+                        offset: Offset(0, 5),
                       ),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.arrow_forward_ios),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                OrderDetailsView(order: order),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+                    ],
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Order: ${order.items[0].productName}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text('Status: ${order.status}',
+                                style: TextStyle(
+                                  color: order.status.toLowerCase() == 'accepted'
+                                      ? Colors.green
+                                      : Colors.deepOrangeAccent,
+                                )),
+                            SizedBox(height: 4),
+                            Text('Date: ${DateFormat('dd/MM/yyyy (HH:mm)').format(order.createdAt)}'),
+                            SizedBox(height: 4),
+                            Text(
+                                'Total: ${order.totalAmount.toStringAsFixed(0)}\$'),
+                          ],
+                        ),
+                      ),
+                       Icon(Icons.arrow_forward_ios),
+                    ],
+                  ),
                 ),
               );
             },

@@ -91,11 +91,11 @@ class HomeView extends HookWidget {
         resizeToAvoidBottomInset: true,
         backgroundColor: ColorUtils.primaryBackgroundColor,
         appBar: AppBar(
-          backgroundColor: ColorUtils.primaryBackgroundColor,
+          backgroundColor: ColorUtils.primaryColor,
           title: Text(
             'Home',
             style: TextStyle(
-              color: ColorUtils.primaryColor,
+              color: ColorUtils.whiteColor,
               fontSize: 24.sp,
               fontWeight: FontWeight.bold,
             ),
@@ -105,153 +105,161 @@ class HomeView extends HookWidget {
       );
     }
 
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      backgroundColor: ColorUtils.primaryBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: ColorUtils.primaryColor,
-        title: Text(
-          'Home',
-          style: TextStyle(
-            color: ColorUtils.whiteColor,
-            fontSize: 24.sp,
-            fontWeight: FontWeight.bold,
+    return GestureDetector(
+      onTap: (){
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        backgroundColor: ColorUtils.primaryBackgroundColor,
+        appBar: AppBar(
+          backgroundColor: ColorUtils.primaryColor,
+          title: Text(
+            'Home',
+            style: TextStyle(
+              color: ColorUtils.whiteColor,
+              fontSize: 24.sp,
+              fontWeight: FontWeight.bold,
+            ),
           ),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.category,color: Colors.white,),
+              onPressed: () {
+                _showCategoryFilterDialog(
+                    context, categories.value, selectedCategory);
+              },
+            ),
+          ],
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.category,color: Colors.white,),
-            onPressed: () {
-              _showCategoryFilterDialog(
-                  context, categories.value, selectedCategory);
-            },
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.all(16.0),
-            child: SearchFormField(
-              hint: 'Search products',
-              controller: searchController,
-              onChanged: searchProducts,
-              prefixIcon: Icon(Icons.search),
-            ),
-          ),
-          if (selectedCategory.value != null)
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8.0),
-              child: Row(
-                children: [
-                  Text('Filtered by: ${selectedCategory.value!.name}'),
-                  IconButton(
-                    icon: Icon(Icons.close),
-                    onPressed: () {
-                      selectedCategory.value = null;
-                      searchProducts(searchController.text);
-                    },
-                  ),
-                ],
+        body: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.only(bottom: 10.0,),
+                child: SearchFormField(
+                  hint: 'Search products',
+                  controller: searchController,
+                  onChanged: searchProducts,
+                  prefixIcon: Icon(Icons.search),
+                ),
               ),
-            ),
-          Expanded(
-            child: ListView.separated(
-              separatorBuilder: (context, index) => const SizedBox(height: 10,),
-              itemCount: getFilteredProducts().length,
-              itemBuilder: (context, index) {
-                final product = getFilteredProducts()[index];
-                return InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            ProductDetailView(product: product),
+              if (selectedCategory.value != null)
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Row(
+                    children: [
+                      Text('Filtered by: ${selectedCategory.value!.name}'),
+                      IconButton(
+                        icon: Icon(Icons.close),
+                        onPressed: () {
+                          selectedCategory.value = null;
+                          searchProducts(searchController.text);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              Expanded(
+                child: ListView.separated(
+                  separatorBuilder: (context, index) => const SizedBox(height: 10,),
+                  itemCount: getFilteredProducts().length,
+                  itemBuilder: (context, index) {
+                    final product = getFilteredProducts()[index];
+                    return InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ProductDetailView(product: product),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: ColorUtils.whiteColor,
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.2),
+                              spreadRadius: 2,
+                              blurRadius: 5,
+                              offset: Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.network(
+                                product.imageUrl,
+                                width: 120.w,
+                                height: 100.h,
+                                fit: BoxFit.fill,
+                              ),
+                            ),
+                            SizedBox(width: 10.w),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    product.name,
+                                    style: TextStyle(
+                                        fontSize: 18.sp,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    product.description,
+                                    style: TextStyle(
+                                        fontSize: 16.sp,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                  Text(
+                                    '${product.price} USD',
+                                    style: TextStyle(
+                                        fontSize: 16.sp, color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                product.favoriteUserIds
+                                        .contains(currentUserId.value)
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                                color: product.favoriteUserIds
+                                        .contains(currentUserId.value)
+                                    ? Colors.red
+                                    : null,
+                              ),
+                              onPressed: () async {
+                                await productService.toggleFavorite(
+                                    product.id, currentUserId.value);
+                                final updatedProducts =
+                                    await productService.fetchProducts();
+                                products.value = updatedProducts;
+                                searchProducts(searchController.text);
+                              },
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   },
-                  child: Container(
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: ColorUtils.whiteColor,
-                      borderRadius: BorderRadius.circular(15),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.2),
-                          spreadRadius: 2,
-                          blurRadius: 5,
-                          offset: Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Image.network(
-                            product.imageUrl,
-                            width: 120.w,
-                            height: 100.h,
-                            fit: BoxFit.fill,
-                          ),
-                        ),
-                        SizedBox(width: 10.w),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                product.name,
-                                style: TextStyle(
-                                    fontSize: 18.sp,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              Text(
-                                product.description,
-                                style: TextStyle(
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.w400),
-                              ),
-                              Text(
-                                '${product.price} USD',
-                                style: TextStyle(
-                                    fontSize: 16.sp, color: Colors.grey),
-                              ),
-                            ],
-                          ),
-                        ),
-                        IconButton(
-                          icon: Icon(
-                            product.favoriteUserIds
-                                    .contains(currentUserId.value)
-                                ? Icons.favorite
-                                : Icons.favorite_border,
-                            color: product.favoriteUserIds
-                                    .contains(currentUserId.value)
-                                ? Colors.red
-                                : null,
-                          ),
-                          onPressed: () async {
-                            await productService.toggleFavorite(
-                                product.id, currentUserId.value);
-                            final updatedProducts =
-                                await productService.fetchProducts();
-                            products.value = updatedProducts;
-                            searchProducts(searchController.text);
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

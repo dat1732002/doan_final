@@ -14,39 +14,52 @@ class OrderDetailsView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Order Details'),
-        backgroundColor: ColorUtils.primaryBackgroundColor,
+        backgroundColor: ColorUtils.primaryColor,
+        title: Text('Chi tiết đơn hàng',style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600
+        ),),
+        centerTitle: true,
+        leading: InkWell(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.w),
+        padding: EdgeInsets.all(10.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildSection(
-              'Order Information',
+              'Thông tin đơn hàng',
               [
-                _buildInfoRow('Order ID', '#${order.id ?? ''}'),
-                _buildInfoRow('Status', order.status),
-                _buildInfoRow('Date',
+                _buildInfoRow('Mã đơn hàng', '#${order.id ?? ''}'),
+                _buildInfoRow('Trạng thái', order.status),
+                _buildInfoRow('Ngày đặt',
                     DateFormat('dd/MM/yyyy HH:mm').format(order.createdAt)),
                 _buildInfoRow(
-                    'Total', '${order.totalAmount.toStringAsFixed(0)}\$'),
-                _buildInfoRow('Payment Method',
-                    order.paymentMethod ?? 'Cash on Delivery'),
+                    'Tổng tiền', '${order.totalAmount.toStringAsFixed(0)}\$'),
+                _buildInfoRow('Phương thức thanh toán',
+                    (order.paymentMethod??"Cash on Delivery") == "Cash on Delivery" ? 'Trả khi nhận hàng': 'Trả khi nhận hàng'),
               ],
             ),
             SizedBox(height: 24.h),
             _buildSection(
-              'Customer Information',
+              'Thông tin khách hàng',
               [
-                _buildInfoRow('Name', order.customerName ?? ''),
-                _buildInfoRow('Phone', order.customerPhone ?? ''),
-                _buildInfoRow('Address', order.customerAddress ?? ''),
+                _buildInfoRow('Tên', order.customerName ?? ''),
+                _buildInfoRow('Số điện thoại', order.customerPhone ?? ''),
+                _buildInfoRow('Địa chỉ', order.customerAddress ?? ''),
               ],
             ),
             SizedBox(height: 24.h),
             _buildSection(
-              'Order Items',
+              'Sản phẩm',
               order.items
                   .map((item) => _buildOrderItem(context, item, order))
                   .toList(),

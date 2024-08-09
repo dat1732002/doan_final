@@ -1,6 +1,7 @@
 import 'package:ecommerce_flutter/features_member/bottom_navigator_member/notifier/bottom_navigation_notifier.dart';
 import 'package:ecommerce_flutter/features_member/cart/cart_view.dart';
 import 'package:ecommerce_flutter/features_member/home/home_view.dart';
+import 'package:ecommerce_flutter/features_member/intro/intro_view.dart';
 import 'package:ecommerce_flutter/features_member/order/order_view.dart';
 import 'package:ecommerce_flutter/features_member/profile/profile_view.dart';
 import 'package:ecommerce_flutter/utils/assets_utils.dart';
@@ -43,7 +44,8 @@ class _BottomNavigationViewState
             return PageView(
               physics: const NeverScrollableScrollPhysics(),
               controller: _pageController,
-              children: const [
+              children:  [
+                IntroView(),
                 HomeView(),
                 CartView(),
                 OrderView(),
@@ -73,6 +75,15 @@ class _BottomNavigationViewState
               );
               return BottomNavigationBar(
                 items: <BottomNavigationBarItem>[
+                  BottomNavigationBarItem(
+                    icon: Icon(
+                Icons.info_outline
+              ),
+                    activeIcon: Icon(
+                        Icons.info
+                    ),
+                    label: "intro",
+                  ),
                   BottomNavigationBarItem(
                     icon: SvgPicture.asset(
                       AssetUtils.home,

@@ -95,11 +95,11 @@ class CartView extends HookWidget {
     if (isLoading.value) {
       return Scaffold(
         appBar: AppBar(
-          backgroundColor: ColorUtils.primaryBackgroundColor,
+          backgroundColor: ColorUtils.primaryColor,
           title: Text(
             'Cart',
             style: TextStyle(
-              color: ColorUtils.primaryColor,
+              color: ColorUtils.whiteColor,
               fontSize: 24.sp,
               fontWeight: FontWeight.bold,
             ),
@@ -111,11 +111,11 @@ class CartView extends HookWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: ColorUtils.primaryBackgroundColor,
+        backgroundColor: ColorUtils.primaryColor,
         title: Text(
           'Cart',
           style: TextStyle(
-            color: ColorUtils.primaryColor,
+            color: ColorUtils.whiteColor,
             fontSize: 24.sp,
             fontWeight: FontWeight.bold,
           ),
@@ -144,8 +144,8 @@ class CartView extends HookWidget {
                             final product = snapshot.data!;
                             return Container(
                               margin: EdgeInsets.symmetric(
-                                  vertical: 10.h, horizontal: 15.w),
-                              padding: EdgeInsets.all(10.h),
+                                  vertical: 10.h, horizontal: 10.w),
+                              padding: EdgeInsets.only(left: 10.h),
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(10),
@@ -164,9 +164,9 @@ class CartView extends HookWidget {
                                     borderRadius: BorderRadius.circular(10),
                                     child: Image.network(
                                       product.imageUrl,
-                                      width: 100.w,
+                                      width: 120.w,
                                       height: 100.h,
-                                      fit: BoxFit.cover,
+                                      fit: BoxFit.fill,
                                     ),
                                   ),
                                   SizedBox(width: 10.w),
