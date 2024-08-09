@@ -43,6 +43,7 @@ class ProductDetailView extends HookWidget {
     }, []);
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: ColorUtils.primaryColor,
         title: Text('Chi tiết sản phẩm',style: TextStyle(
@@ -64,7 +65,7 @@ class ProductDetailView extends HookWidget {
           ? Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               child: Padding(
-                padding: EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(10.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -96,9 +97,9 @@ class ProductDetailView extends HookWidget {
                     ),
                     Row(
                       children: [
-                        Text('Quantity: ', style: TextStyle(fontSize: 16.sp)),
+                        Text('Số lượng: ', style: TextStyle(fontSize: 16.sp,fontWeight: FontWeight.w500)),
                         IconButton(
-                          icon: Icon(Icons.remove),
+                          icon: Icon(Icons.remove,color: Colors.red,),
                           onPressed: () {
                             if (quantity.value > 1) {
                               quantity.value--;
@@ -107,50 +108,72 @@ class ProductDetailView extends HookWidget {
                         ),
                         Text('${quantity.value}'),
                         IconButton(
-                          icon: Icon(Icons.add),
+                          icon: Icon(Icons.add,color: Colors.green,),
                           onPressed: () {
                             quantity.value++;
                           },
                         ),
                       ],
                     ),
-                    DropdownButton<String>(
-                      value: selectedSize.value,
-                      hint: Text('Select Size'),
-                      isExpanded: true,
-                      items: updatedProduct.value.availableSizes.map((String size) {
-                        return DropdownMenuItem<String>(
-                          value: size,
-                          child: Text(size),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        selectedSize.value = newValue;
-                      },
-                    ),
-                    ElevatedButton(
-                      onPressed: selectedSize.value != null
-                          ? () async {
-                              final cartItem = CartItemModel(
-                                productId: product.id,
-                                quantity: quantity.value,
-                                imageUrl: product.imageUrl,
-                                productName: product.name,
-                                price: product.price,
-                                size: selectedSize.value!,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        InkWell(
+                          onTap:selectedSize.value != null
+                              ? () async {
+                            final cartItem = CartItemModel(
+                              productId: product.id,
+                              quantity: quantity.value,
+                              imageUrl: product.imageUrl,
+                              productName: product.name,
+                              price: product.price,
+                              size: selectedSize.value!,
+                            );
+                            await cartService.addOrUpdateCartItem(
+                                currentUserId.value, cartItem);
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text('Đã thêm vào giỏ hàng!'),
+                            ));
+                          }
+                              : null,
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                                color: Colors.green,
+                                borderRadius: BorderRadius.circular(30),
+                                border: Border.all(color: Colors.black12)
+                            ),
+                            child: Text('Thêm vào giỏ hàng',style: TextStyle(
+                                color: Colors.white
+                            ),),
+                          ),
+                        ),
+                        Container(
+                          width: 70,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.black12)
+                          ),
+                          padding: EdgeInsets.only(left: 6,right: 6),
+                          child: DropdownButton<String>(
+                            value: selectedSize.value,
+                            hint: Text('Size'),
+                            isExpanded: true,
+                            items: updatedProduct.value.availableSizes.map((String size) {
+                              return DropdownMenuItem<String>(
+                                value: size,
+                                child: Text(size),
                               );
-                              await cartService.addOrUpdateCartItem(
-                                  currentUserId.value, cartItem);
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: Text('Added to cart!'),
-                              ));
-                            }
-                          : null,
-                      child: Text('Add to Cart'),
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              selectedSize.value = newValue;
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                     SizedBox(height: 16.h),
                     Text(
-                      'Comments',
+                      'Bình luận',
                       style: TextStyle(
                           fontSize: 20.sp, fontWeight: FontWeight.bold),
                     ),
@@ -179,7 +202,7 @@ class CommentsList extends HookWidget {
   @override
   Widget build(BuildContext context) {
     return comments.isEmpty
-        ? Text('No comments yet.',
+        ? Text('Chưa có bình luận nào.',
             style: TextStyle(fontStyle: FontStyle.italic))
         : ListView.builder(
             shrinkWrap: true,

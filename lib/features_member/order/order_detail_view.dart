@@ -13,6 +13,7 @@ class OrderDetailsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: ColorUtils.primaryColor,
         title: Text('Chi tiết đơn hàng',style: TextStyle(
@@ -81,10 +82,10 @@ class OrderDetailsView extends StatelessWidget {
         SizedBox(height: 8.h),
         Container(
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade300),
-            borderRadius: BorderRadius.circular(8.r),
+            color: Colors.grey.shade100,
+            border: Border.all(color: Colors.black),
           ),
-          padding: EdgeInsets.all(16.w),
+          padding: EdgeInsets.fromLTRB(10,10,10,0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: children,
@@ -121,15 +122,21 @@ class OrderDetailsView extends StatelessWidget {
         }
       },
       child: Container(
-        margin: EdgeInsets.only(bottom: 16.h),
+        margin: EdgeInsets.only(bottom: 10.h),
+        padding: EdgeInsets.fromLTRB(5,0,5,0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.black12)
+        ),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(8.r),
               child: Image.network(
                 item.imageUrl,
-                width: 80.w,
+                width: 100.w,
                 height: 80.h,
                 fit: BoxFit.cover,
               ),
@@ -144,15 +151,11 @@ class OrderDetailsView extends StatelessWidget {
                     style:
                         TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 4.h),
                   Text('Size: ${item.size}'),
-                  SizedBox(height: 4.h),
-                  Text('Quantity: ${item.quantity}'),
-                  SizedBox(height: 4.h),
-                  Text('Price: ${item.price.toStringAsFixed(0)}\$'),
-                  SizedBox(height: 4.h),
+                  Text('Số lượng: ${item.quantity}'),
+                  Text('Giá: ${item.price.toStringAsFixed(0)}\$'),
                   Text(
-                    'Total: ${(item.price * item.quantity).toStringAsFixed(0)}\$',
+                    'Tổng tiền: ${(item.price * item.quantity).toStringAsFixed(0)}\$',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -171,10 +174,10 @@ class OrderDetailsView extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Add Comment for ${item.productName}'),
+        title: Text('Bình luận về ${item.productName}'),
         content: TextField(
           controller: commentController,
-          decoration: InputDecoration(labelText: 'Comment'),
+          decoration: InputDecoration(labelText: 'Viết bình luận'),
         ),
         actions: [
           TextButton(
