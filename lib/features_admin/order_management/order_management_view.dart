@@ -14,13 +14,13 @@ class OrderManagementView extends HookWidget {
     final orderService = OrderService();
 
     return Scaffold(
-      backgroundColor: ColorUtils.primaryBackgroundColor,
+      backgroundColor: ColorUtils.whiteColor,
       appBar: AppBar(
-        backgroundColor: ColorUtils.primaryBackgroundColor,
+        backgroundColor: ColorUtils.primaryColor,
         title: Text(
-          'Order Management',
+          'Quản lý đơn hàng',
           style: TextStyle(
-            color: ColorUtils.primaryColor,
+            color: ColorUtils.whiteColor,
             fontSize: 24.sp,
             fontWeight: FontWeight.bold,
           ),
@@ -34,7 +34,7 @@ class OrderManagementView extends HookWidget {
           }
 
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No orders found.'));
+            return Center(child: Text('Không tìm thấy đơn hàng nào.'));
           }
 
           final orders = snapshot.data!;
@@ -43,59 +43,80 @@ class OrderManagementView extends HookWidget {
             itemCount: orders.length,
             itemBuilder: (context, index) {
               final order = orders[index];
-              return Container(
-                margin: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
-                padding: EdgeInsets.all(16.w),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8.r),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
-                      blurRadius: 5,
-                      offset: Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Order #${order.id}',
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 8.h),
-                          Text(
-                            'Total: ${order.totalAmount.toStringAsFixed(0)}\$',
-                            style: TextStyle(fontSize: 14.sp),
-                          ),
-                          SizedBox(height: 4.h),
-                          Text(
-                            'Status: ${order.status}',
-                            style: TextStyle(
-                              color: order.status.toLowerCase() == 'accepted'
-                                  ? Colors.green
-                                  : Colors.black,
-                              fontSize: 14.sp,
-                            ),
-                          ),
-                        ],
+              return InkWell(
+                onTap: (){
+                  _navigateToOrderDetails(context, order);
+                },
+                child: Container(
+                  margin: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
+                  padding: EdgeInsets.all(16.w),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(8.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.1),
+                        blurRadius: 5,
+                        offset: Offset(0, 3),
                       ),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.arrow_forward),
-                      onPressed: () {
-                        _navigateToOrderDetails(context, order);
-                      },
-                    ),
-                  ],
+                    ],
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Đơn hàng: ${order.items[0].productName}',
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 8.h),
+                            Text(
+                              'Tổng tiền: ${order.totalAmount.toStringAsFixed(0)}\$',
+                              style: TextStyle(fontSize: 14.sp),
+                            ),
+                            SizedBox(height: 4.h),
+                            Text(
+                              'Khách hàng: ${order.customerName}',
+                              style: TextStyle(fontSize: 14.sp),
+                            ),
+                            SizedBox(height: 4.h),
+                            Row(
+                              children: [
+                                Text(
+                                  'Trạng thái: ',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 14.sp,
+                                  ),
+                                ),
+                                Text(
+                                  '${order.status}',
+                                  style: TextStyle(
+                                    color: order.status.toLowerCase() == 'accepted'
+                                        ? Colors.green
+                                        : Colors.red,
+                                    fontSize: 14.sp,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.arrow_forward),
+                        onPressed: () {
+                          _navigateToOrderDetails(context, order);
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               );
             },

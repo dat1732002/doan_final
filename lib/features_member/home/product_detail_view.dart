@@ -10,8 +10,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ProductDetailView extends HookWidget {
   final ProductModel product;
-
-  const ProductDetailView({Key? key, required this.product}) : super(key: key);
+  final bool isAdmin;
+  const ProductDetailView({Key? key, required this.product,required this.isAdmin}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +95,8 @@ class ProductDetailView extends HookWidget {
                       style: TextStyle(fontSize: 16.sp,
                       fontStyle: FontStyle.italic),
                     ),
-                    Row(
+                    if(!isAdmin)
+                      Row(
                       children: [
                         Text('Số lượng: ', style: TextStyle(fontSize: 16.sp,fontWeight: FontWeight.w500)),
                         IconButton(
@@ -115,6 +116,7 @@ class ProductDetailView extends HookWidget {
                         ),
                       ],
                     ),
+                    if(!isAdmin)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

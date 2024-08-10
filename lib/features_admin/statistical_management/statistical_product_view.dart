@@ -18,13 +18,18 @@ class StatisticalProductView extends HookWidget {
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: ColorUtils.primaryBackgroundColor,
+      backgroundColor: ColorUtils.whiteColor,
       appBar: AppBar(
-        backgroundColor: ColorUtils.primaryBackgroundColor,
+        backgroundColor: ColorUtils.primaryColor,
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: Text(
-          'Product Statistics',
+          'Thống kê sản phẩm',
           style: TextStyle(
-            color: ColorUtils.primaryColor,
+            color: ColorUtils.whiteColor,
             fontSize: 24.sp,
             fontWeight: FontWeight.bold,
           ),
@@ -53,31 +58,38 @@ class StatisticalProductView extends HookWidget {
             // Sort favorite counts and get top 3
             final topFavorites = favoriteCounts.entries.toList()
               ..sort((a, b) => b.value.compareTo(a.value));
-            final top3Favorites = topFavorites.take(3).toList();
+            final top3Favorites = topFavorites.toList();
 
             return Padding(
               padding: EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Products by Category',
-                    style:
-                        TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 16.h),
-                  Expanded(
-                    child: CategoryChart(categoryCounts: categoryCounts),
-                  ),
-                  SizedBox(height: 24.h),
-                  Text(
-                    'Top 3 Favorite Products',
-                    style:
-                        TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 16.h),
-                  TopFavoritesList(favoriteCounts: top3Favorites),
-                ],
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Sản phẩm theo danh mục',
+                      style: TextStyle(
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+                    SizedBox(
+                      height: 200.h, // Cung cấp chiều cao cho biểu đồ
+                      child: CategoryChart(categoryCounts: categoryCounts),
+                    ),
+                    SizedBox(height: 24.h),
+                    Text(
+                      'Xếp hạng sản phẩm được yêu thích nhất',
+                      style: TextStyle(
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+                    TopFavoritesList(favoriteCounts: top3Favorites),
+                  ],
+                ),
               ),
             );
           }
@@ -97,7 +109,7 @@ class CategoryChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<String> categories = categoryCounts.keys.toList();
     final List<double> values =
-        categoryCounts.values.map((e) => e.toDouble()).toList();
+    categoryCounts.values.map((e) => e.toDouble()).toList();
     final maxY = values.reduce((a, b) => a > b ? a : b);
 
     return BarChart(
@@ -151,7 +163,7 @@ class CategoryChart extends StatelessWidget {
         borderData: FlBorderData(show: false),
         barGroups: List.generate(
           categories.length,
-          (index) => BarChartGroupData(
+              (index) => BarChartGroupData(
             x: index,
             barRods: [
               BarChartRodData(
@@ -178,6 +190,7 @@ class TopFavoritesList extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView.builder(
       shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(), // Ngăn danh sách cuộn độc lập
       itemCount: favoriteCounts.length,
       itemBuilder: (context, index) {
         final product = favoriteCounts[index];
@@ -186,8 +199,10 @@ class TopFavoritesList extends StatelessWidget {
             backgroundColor: ColorUtils.primaryColor,
             child: Text(
               '${index + 1}',
-              style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           title: Text(

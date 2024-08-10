@@ -14,50 +14,112 @@ class OrderManagementDetailsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Order Details'),
-        backgroundColor: ColorUtils.primaryBackgroundColor,
+        backgroundColor: ColorUtils.primaryColor,
+        title: Text('Chi tiết đơn hàng',style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600
+        ),),
+        centerTitle: true,
+        leading: InkWell(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.w),
+        padding: EdgeInsets.all(10.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildSection(
-              'Order Information',
+              'Thông tin đơn hàng',
               [
-                _buildInfoRow('Order ID', '#${order.id ?? ''}'),
-                _buildInfoRow('Status', order.status),
-                _buildInfoRow('Date',
+                _buildInfoRow('Mã đơn hàng', '#${order.id ?? ''}'),
+                _buildInfoRow('Trạng thái', order.status),
+                _buildInfoRow('Ngày đặt',
                     DateFormat('dd/MM/yyyy HH:mm').format(order.createdAt)),
                 _buildInfoRow(
-                    'Total', '${order.totalAmount.toStringAsFixed(0)} \$'),
-                _buildInfoRow('Payment Method',
-                    order.paymentMethod ?? 'Cash on Delivery'),
+                    'Tổng tiền', '${order.totalAmount.toStringAsFixed(0)}\$'),
+                _buildInfoRow('Phương thức thanh toán',
+                    (order.paymentMethod??"Cash on Delivery") == "Cash on Delivery" ? 'Trả khi nhận hàng': 'Trả khi nhận hàng'),
               ],
             ),
             SizedBox(height: 24.h),
             _buildSection(
-              'Customer Information',
+              'Thông tin khách hàng',
               [
-                _buildInfoRow('Name', order.customerName ?? ''),
-                _buildInfoRow('Phone', order.customerPhone ?? ''),
-                _buildInfoRow('Address', order.customerAddress ?? ''),
+                _buildInfoRow('Tên', order.customerName ?? ''),
+                _buildInfoRow('Số điện thoại', order.customerPhone ?? ''),
+                _buildInfoRow('Địa chỉ', order.customerAddress ?? ''),
               ],
             ),
             SizedBox(height: 24.h),
             _buildSection(
-              'Order Items',
-              order.items.map((item) => _buildOrderItem(item)).toList(),
+              'Sản phẩm',
+              order.items
+                  .map((item) => _buildOrderItem(item,))
+                  .toList(),
             ),
             SizedBox(height: 24.h),
-            _buildActionButtons(context),
+            if(order.status.toLowerCase()!='accepted') _buildActionButtons(context),
           ],
         ),
       ),
     );
   }
 
+
+  Widget _buildOrderItem(OrderItem item) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 10.h),
+      padding: EdgeInsets.fromLTRB(5,0,5,0),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.black12)
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8.r),
+            child: Image.network(
+              item.imageUrl,
+              width: 100.w,
+              height: 80.h,
+              fit: BoxFit.cover,
+            ),
+          ),
+          SizedBox(width: 16.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.productName,
+                  style:
+                  TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
+                ),
+                Text('Size: ${item.size}'),
+                Text('Số lượng: ${item.quantity}'),
+                Text('Giá: ${item.price.toStringAsFixed(0)}\$'),
+                Text(
+                  'Tổng tiền: ${(item.price * item.quantity).toStringAsFixed(0)}\$',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
   Widget _buildSection(String title, List<Widget> children) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,10 +131,10 @@ class OrderManagementDetailsView extends StatelessWidget {
         SizedBox(height: 8.h),
         Container(
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade300),
-            borderRadius: BorderRadius.circular(8.r),
+            color: Colors.grey.shade100,
+            border: Border.all(color: Colors.black),
           ),
-          padding: EdgeInsets.all(16.w),
+          padding: EdgeInsets.fromLTRB(10,10,10,0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: children,
@@ -89,49 +151,18 @@ class OrderManagementDetailsView extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: TextStyle(fontWeight: FontWeight.w500)),
-          Text(value),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildOrderItem(OrderItem item) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 16.h),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8.r),
-            child: Image.network(
-              item.imageUrl,
-              width: 80.w,
-              height: 80.h,
-              fit: BoxFit.cover,
-            ),
-          ),
-          SizedBox(width: 16.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.productName,
-                  style:
-                      TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 4.h),
-                Text('Quantity: ${item.quantity}'),
-                SizedBox(height: 4.h),
-                Text('Price: ${item.price.toStringAsFixed(0)}\$'),
-                SizedBox(height: 4.h),
-                Text(
-                  'Total: ${(item.price * item.quantity).toStringAsFixed(0)}\$',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-          ),
+          Text(value.toLowerCase() == 'accepted'
+              ? 'Thành công'
+              : value.toLowerCase() == 'pending'
+              ? 'Chờ xác nhận'
+              : value,
+              style: TextStyle(
+                color: value.toLowerCase() == 'accepted'
+                    ? Colors.green
+                    : value.toLowerCase() == 'pending'
+                    ? Colors.red
+                    : Colors.black,
+              )),
         ],
       ),
     );
@@ -145,7 +176,7 @@ class OrderManagementDetailsView extends StatelessWidget {
           style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
           onPressed: () => _showCancelDialog(context),
           child: Text(
-            'Cancel',
+            'Hủy',
             style: TextStyle(color: ColorUtils.whiteColor),
           ),
         ),
@@ -153,7 +184,7 @@ class OrderManagementDetailsView extends StatelessWidget {
           style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
           onPressed: () => _showAcceptDialog(context),
           child: Text(
-            'Accept',
+            'Xác nhận',
             style: TextStyle(color: ColorUtils.whiteColor),
           ),
         ),
@@ -165,12 +196,12 @@ class OrderManagementDetailsView extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Cancel Order'),
-        content: Text('Are you sure you want to cancel this order?'),
+        title: Text('Hủy đơn hàng'),
+        content: Text('Bạn có chắc là muốn hủy đơn hàng này?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('No'),
+            child: Text('Không'),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -178,7 +209,7 @@ class OrderManagementDetailsView extends StatelessWidget {
               Navigator.pop(context);
               Navigator.pop(context); // Close details view
             },
-            child: Text('Yes'),
+            child: Text('Có'),
           ),
         ],
       ),
@@ -189,12 +220,12 @@ class OrderManagementDetailsView extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Accept Order'),
-        content: Text('Are you sure you want to accept this order?'),
+        title: Text('Xác nhận đơn hàng'),
+        content: Text('Bạn có chắc là muốn xác nhận đơn hàng này?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('No'),
+            child: Text('Không'),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -202,7 +233,7 @@ class OrderManagementDetailsView extends StatelessWidget {
               Navigator.pop(context);
               Navigator.pop(context);
             },
-            child: Text('Yes'),
+            child: Text('Có'),
           ),
         ],
       ),

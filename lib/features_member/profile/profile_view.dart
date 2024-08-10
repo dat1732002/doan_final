@@ -1,3 +1,4 @@
+import 'package:ecommerce_flutter/features_member/profile/change_pass.dart';
 import 'package:ecommerce_flutter/features_member/profile/profile_detail_view.dart';
 import 'package:ecommerce_flutter/features_member/profile/widgets/button_settings_widget.dart';
 import 'package:ecommerce_flutter/services/user_service.dart';
@@ -7,7 +8,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ecommerce_flutter/models/user_model.dart';
 import 'package:ecommerce_flutter/utils/color_utils.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class ProfileView extends HookWidget {
   const ProfileView({Key? key}) : super(key: key);
@@ -34,8 +35,7 @@ class ProfileView extends HookWidget {
           ),
         );
         if (result == true) {
-          await _loadUserData(
-              userService, user, isLoading);
+          await _loadUserData(userService, user, isLoading);
         }
       }
     }
@@ -46,7 +46,7 @@ class ProfileView extends HookWidget {
       appBar: AppBar(
         backgroundColor: ColorUtils.primaryColor,
         title: Text(
-          'Profile',
+          'Trang cá nhân',
           style: TextStyle(
             color: ColorUtils.whiteColor,
             fontSize: 24.sp,
@@ -57,97 +57,106 @@ class ProfileView extends HookWidget {
       body: isLoading.value
           ? Center(child: CircularProgressIndicator())
           : user.value != null
-              ? Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 20),
-                  padding: const EdgeInsets.only(bottom: 40),
-                  child: SingleChildScrollView(
-                    child: Column(
+          ? Container(
+        margin: EdgeInsets.symmetric(horizontal: 20.w),
+        padding: EdgeInsets.only(bottom: 40.h),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                padding: EdgeInsets.all(20.r),
+                margin: EdgeInsets.symmetric(vertical: 20.h),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15.r),
+                  gradient: LinearGradient(
+                    colors: [
+                      ColorUtils.blueColor,
+                      ColorUtils.blueMiddleColor,
+                    ],
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 30.r,
+                      backgroundColor: ColorUtils.whiteColor,
+                      backgroundImage: user.value?.profilePictureUrl != null && user.value!.profilePictureUrl!.isNotEmpty
+                          ? NetworkImage(user.value!.profilePictureUrl!)
+                          : null,
+                      child: user.value?.profilePictureUrl == null || user.value!.profilePictureUrl!.isEmpty
+                          ? Icon(Icons.person, size: 40.h, color: ColorUtils.primaryColor)
+                          : null,
+                    ),
+                    SizedBox(width: 20.w),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(30),
-                          margin: const EdgeInsets.symmetric(vertical: 20),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            gradient: LinearGradient(
-                              colors: [
-                                ColorUtils.blueColor,
-                                ColorUtils.blueMiddleColor,
-                              ],
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Container(
-                                margin: EdgeInsets.only(right: 20.r),
-                                width: 55.w,
-                                height: 55.h,
-                                decoration: BoxDecoration(
-                                  color: ColorUtils.whiteColor,
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                child: Icon(Icons.person,
-                                    size: 40.h, color: ColorUtils.primaryColor),
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  Text(
-                                    user.value!.name,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      color: ColorUtils.whiteColor,
-                                      fontSize: 16.sp,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 5),
-                                  Text(
-                                    user.value!.email,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      color: ColorUtils.whiteColor,
-                                      fontSize: 14.sp,
-                                    ),
-                                  ),
-                                ],
-                              )
-                            ],
+                        Text(
+                          user.value!.name,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: ColorUtils.whiteColor,
+                            fontSize: 16.sp,
                           ),
                         ),
-                        ButtonSettingsWidget(
-                          icon: SvgPicture.asset(
-                            'assets/icons/ic_user_account.svg',
+                        SizedBox(height: 5.h),
+                        Text(
+                          user.value!.email,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: ColorUtils.whiteColor,
+                            fontSize: 14.sp,
                           ),
-                          title: 'Update Profile',
-                          onPressed: _handleUpdateUser,
-                        ),
-                        Container(
-                          height: 1,
-                          width: double.infinity,
-                          color: ColorUtils.textColor,
-                        ),
-                        ButtonSettingsWidget(
-                          icon: Icon(Icons.logout),
-                          title: 'Logout',
-                          onPressed: () {
-                            Routes.goToSignInScreen(context);
-                          },
                         ),
                       ],
                     ),
-                  ),
-                )
-              : Center(child: Text('User not found')),
+                  ],
+                ),
+              ),
+              ButtonSettingsWidget(
+                icon: SvgPicture.asset('assets/icons/ic_user_account.svg'),
+                title: 'Chỉnh sửa thông tin',
+                onPressed: _handleUpdateUser,
+              ),
+              ButtonSettingsWidget(
+                icon: Icon(Icons.password),
+                title: 'Đổi mật khẩu',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ChangePasswordScreen()),
+                  );
+                },
+              ),
+              SizedBox(height: 10.h),
+              Container(
+                height: 1.h,
+                width: double.infinity,
+                color: ColorUtils.textColor,
+              ),
+
+              SizedBox(height: 10.h),
+              ButtonSettingsWidget(
+                icon: Icon(Icons.logout),
+                title: 'Đăng xuất',
+                onPressed: () {
+                  Routes.goToSignInScreen(context);
+                },
+              ),
+
+            ],
+          ),
+        ),
+      )
+          : Center(child: Text('User not found')),
     );
   }
 
   Future<void> _loadUserData(
-    UserService userService,
-    ValueNotifier<UserModel?> user,
-    ValueNotifier<bool> isLoading,
-  ) async {
+      UserService userService,
+      ValueNotifier<UserModel?> user,
+      ValueNotifier<bool> isLoading,
+      ) async {
     isLoading.value = true;
     try {
       String userId = userService.getCurrentUserId();
@@ -159,7 +168,8 @@ class ProfileView extends HookWidget {
         email: userData['email'],
         dateOfBirth: userData['dateOfBirth'],
         role: userData['role'],
-        address: userData['address']
+        address: userData['address'],
+        profilePictureUrl: userData['profilePictureUrl'],
       );
     } catch (e) {
       print('Error fetching user data: $e');

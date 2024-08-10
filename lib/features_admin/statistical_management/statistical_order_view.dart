@@ -37,6 +37,23 @@ class StatisticalOrderView extends HookWidget {
           .fold(0, (sum, order) => sum + order.totalAmount);
     }
 
+    int getTotalShoesSold() {
+      int total = 0;
+      for (var order in orders.value) {
+        total += order.items.length;
+      }
+      return total;
+    }
+    int getTotalShoesSoldAccepted() {
+      int total = 0;
+      for (var order in orders.value) {
+        if (order.status == 'Accepted' ) {
+          total += order.items.length;
+        }
+      }
+      return total;
+    }
+
     double getActualRevenue() {
       return orders.value
           .where((order) => order.status == 'Accepted')
@@ -44,14 +61,18 @@ class StatisticalOrderView extends HookWidget {
     }
 
     return Scaffold(
-      backgroundColor: ColorUtils.primaryBackgroundColor,
+      backgroundColor: ColorUtils.whiteColor,
       appBar: AppBar(
-        backgroundColor: ColorUtils.primaryBackgroundColor,
-        elevation: 0,
+        backgroundColor: ColorUtils.primaryColor,
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: Text(
-          'Order Statistics',
+          'Thống kê đơn hàng',
           style: TextStyle(
-            color: ColorUtils.primaryColor,
+            color: ColorUtils.whiteColor,
             fontSize: 24.sp,
             fontWeight: FontWeight.bold,
           ),
@@ -61,12 +82,12 @@ class StatisticalOrderView extends HookWidget {
           ? Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               child: Padding(
-                padding: EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(10.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Overview',
+                      'Tổng quan',
                       style: TextStyle(
                         fontSize: 20.sp,
                         fontWeight: FontWeight.bold,
@@ -78,16 +99,16 @@ class StatisticalOrderView extends HookWidget {
                       children: [
                         Expanded(
                           child: StatBox(
-                            title: 'Accepted',
+                            title: 'Đã xác nhận',
                             value: getAcceptedOrdersCount().toString(),
                             color: Colors.green,
                             icon: Icons.check_circle,
                           ),
                         ),
-                        SizedBox(width: 16.w),
+                        SizedBox(width: 5.w),
                         Expanded(
                           child: StatBox(
-                            title: 'Pending',
+                            title: 'Chờ xác nhận',
                             value: getPendingOrdersCount().toString(),
                             color: Colors.orange,
                             icon: Icons.timer,
@@ -97,7 +118,7 @@ class StatisticalOrderView extends HookWidget {
                     ),
                     SizedBox(height: 24.h),
                     Text(
-                      'Revenue',
+                      'Doanh thu',
                       style: TextStyle(
                         fontSize: 20.sp,
                         fontWeight: FontWeight.bold,
@@ -109,6 +130,67 @@ class StatisticalOrderView extends HookWidget {
                       expectedRevenue: getTotalExpectedRevenue(),
                       actualRevenue: getActualRevenue(),
                     ),
+                    SizedBox(height: 24.h),
+                    Text(
+                      'Sản phẩm bán ra',
+                      style: TextStyle(
+                        fontSize: 20.sp,
+                        fontWeight: FontWeight.bold,
+                        color: ColorUtils.primaryColor,
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+                    Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.blue.shade300, Colors.blue.shade600],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Tổng số sản phẩm đã được đặt',
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: 8.h),
+                      Text(
+                        '${getTotalShoesSold()}',
+                        style: TextStyle(
+                          fontSize: 24.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: 16.h),
+                      Text(
+                        'Số sản phẩm bán thành công',
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: 8.h),
+                      Text(
+                        '${getTotalShoesSoldAccepted()}',
+                        style: TextStyle(
+                          fontSize: 24.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                   ],
                 ),
               ),
@@ -197,7 +279,7 @@ class RevenueBox extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Expected Revenue',
+            'Doanh thu kỳ vọng',
             style: TextStyle(
               fontSize: 16.sp,
               fontWeight: FontWeight.bold,
@@ -215,7 +297,7 @@ class RevenueBox extends StatelessWidget {
           ),
           SizedBox(height: 16.h),
           Text(
-            'Actual Revenue',
+            'Doanh thu thực tế',
             style: TextStyle(
               fontSize: 16.sp,
               fontWeight: FontWeight.bold,

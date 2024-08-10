@@ -65,6 +65,7 @@ class OrderDetailsView extends StatelessWidget {
                   .map((item) => _buildOrderItem(context, item, order))
                   .toList(),
             ),
+
           ],
         ),
       ),

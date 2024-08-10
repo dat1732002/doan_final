@@ -14,13 +14,13 @@ class StatisticalManagementView extends HookWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: ColorUtils.primaryBackgroundColor,
+      backgroundColor: ColorUtils.whiteColor,
       appBar: AppBar(
-        backgroundColor: ColorUtils.primaryBackgroundColor,
+        backgroundColor: ColorUtils.primaryColor,
         title: Text(
-          'Statistical Management',
+          'Báo cáo thống kê',
           style: TextStyle(
-            color: ColorUtils.primaryColor,
+            color: ColorUtils.whiteColor,
             fontSize: 24.sp,
             fontWeight: FontWeight.bold,
           ),
@@ -33,7 +33,7 @@ class StatisticalManagementView extends HookWidget {
             icon: SvgPicture.asset(
               'assets/icons/ic_product.svg',
             ),
-            title: 'Product statistics',
+            title: 'Thống kê sản phẩm',
             onPressed: () {
               Navigator.push(
                 context,
@@ -51,7 +51,7 @@ class StatisticalManagementView extends HookWidget {
             icon: SvgPicture.asset(
               'assets/icons/ic_order.svg',
             ),
-            title: 'Order statistics',
+            title: 'Thống kê đơn hàng',
             onPressed: () {
               Navigator.push(
                 context,

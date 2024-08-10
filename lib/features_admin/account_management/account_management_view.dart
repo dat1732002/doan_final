@@ -40,7 +40,7 @@ class AccountManagementView extends HookWidget {
         appBar: AppBar(
           backgroundColor: ColorUtils.primaryBackgroundColor,
           title: Text(
-            'Account Management',
+            'Quản lý tài khoản',
             style: TextStyle(
               color: ColorUtils.primaryColor,
               fontSize: 24.sp,
@@ -66,7 +66,7 @@ class AccountManagementView extends HookWidget {
       appBar: AppBar(
         backgroundColor: ColorUtils.primaryColor,
         title: Text(
-          'Account Management',
+          'Quản lý tài khoản',
           style: TextStyle(
             color: ColorUtils.whiteColor,
             fontSize: 24.sp,
@@ -88,14 +88,10 @@ class AccountManagementView extends HookWidget {
           return Card(
             margin: EdgeInsets.symmetric(vertical: 10.h, horizontal: 15.w),
             elevation: 5,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-            ),
             child: Container(
-              padding: EdgeInsets.all(15.w),
+              padding: EdgeInsets.only(left:8.w),
               decoration: BoxDecoration(
-                color: ColorUtils.blueLightColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(15),
+                color: Colors.grey.shade100,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -111,7 +107,6 @@ class AccountManagementView extends HookWidget {
                           color: ColorUtils.primaryColor,
                         ),
                       ),
-                      SizedBox(height: 5.h),
                       Text(
                         user.email,
                         style: TextStyle(
@@ -153,50 +148,72 @@ class AccountManagementView extends HookWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Edit User'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          titlePadding: EdgeInsets.zero,
+          contentPadding: EdgeInsets.all(15),
+          actionsPadding: EdgeInsets.all(5),
+          actionsAlignment: MainAxisAlignment.spaceBetween,
+          backgroundColor: Colors.white,
+          title: Container(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+              color: ColorUtils.primaryColor,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  spreadRadius: 1,
+                  blurRadius: 4,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Center(
+              child: Text(
+                'Chỉnh sửa tài khoản',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+          ),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextField(
-                  controller: nameController,
-                  decoration: InputDecoration(labelText: 'Name'),
-                ),
-                TextField(
-                  controller: phoneController,
-                  decoration: InputDecoration(labelText: 'Phone'),
-                ),
-                TextField(
-                  controller: emailController,
-                  decoration: InputDecoration(labelText: 'Email'),
-                  enabled: false, // Không cho phép chỉnh sửa email
-                ),
-                TextField(
-                  controller: dateOfBirthController,
-                  decoration: InputDecoration(labelText: 'Date of Birth'),
-                ),
-                TextField(
-                  controller: addressController,
-                  decoration: InputDecoration(labelText: 'Address'),
-                ),
+                _buildTextFormField(nameController, 'Name'),
+                _buildTextFormField(phoneController, 'Phone'),
+                _buildTextFormField(emailController, 'Email', enabled: false),
+                _buildTextFormField(dateOfBirthController, 'Date of Birth'),
+                _buildTextFormField(addressController, 'Address'),
               ],
             ),
           ),
           actions: [
-            TextButton(
+            _buildActionButton(
+              context: context,
+              label: 'Hủy',
+              color: Colors.grey,
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Cancel'),
             ),
-            TextButton(
+            _buildActionButton(
+              context: context,
+              label: isUpdating.value ? '' : 'Lưu',
+              color: Colors.blueAccent,
               onPressed: () async {
+                if (isUpdating.value) return; // Prevent multiple submissions
                 isUpdating.value = true;
                 final updatedUser = UserModel(
                   id: user.id,
                   name: nameController.text,
                   phone: phoneController.text,
-                  email: user.email, // Giữ nguyên email
+                  email: user.email,
                   dateOfBirth: dateOfBirthController.text,
                   role: user.role,
                   address: addressController.text,
@@ -213,12 +230,92 @@ class AccountManagementView extends HookWidget {
                   isUpdating.value = false;
                 }
               },
-              child:
-                  isUpdating.value ? CircularProgressIndicator() : Text('Save'),
+              child: isUpdating.value
+                  ? SizedBox(
+                height: 24,
+                width: 24,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                ),
+              )
+                  : Text('Lưu'),
+            ),
+            _buildActionButton(
+              context: context,
+              label: isUpdating.value ? '' : 'Xóa',
+              color: Colors.redAccent,
+              onPressed: () async {
+                if (isUpdating.value) return; // Prevent multiple submissions
+                isUpdating.value = true;
+                try {
+                  await UserService().deleteUser(user.id);
+                  onUpdate();
+                  Navigator.of(context).pop();
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text('Failed to delete user: $e'),
+                  ));
+                } finally {
+                  isUpdating.value = false;
+                }
+              },
+              child: isUpdating.value
+                  ? SizedBox(
+                height: 24,
+                width: 24,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                ),
+              )
+                  : Text('Xóa'),
             ),
           ],
         );
       },
+    );
+  }
+
+  Widget _buildTextFormField(TextEditingController controller, String label, {bool enabled = true}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        enabled: enabled,
+      ),
+    );
+  }
+
+  Widget _buildActionButton({
+    required BuildContext context,
+    required String label,
+    required Color color,
+    required VoidCallback onPressed,
+    Widget? child,
+  }) {
+    return InkWell(
+      onTap: onPressed,
+      child: Container(
+        width: 50,
+        height: 40,
+        alignment: Alignment.center,
+        margin: EdgeInsets.symmetric(horizontal: 4),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.black12),
+        ),
+        child: child ??
+            Text(
+              label,
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+      ),
     );
   }
 }

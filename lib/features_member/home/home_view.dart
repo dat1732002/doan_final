@@ -173,7 +173,7 @@ class HomeView extends HookWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                ProductDetailView(product: product),
+                                ProductDetailView(product: product,isAdmin: false,),
                           ),
                         );
                       },

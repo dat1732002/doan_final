@@ -32,6 +32,7 @@ class _BottomNavigationViewState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Column(
         children: [
           Expanded(
@@ -54,7 +55,7 @@ class _BottomNavigationViewState
               );
               return Container(
                 color: ColorUtils.primaryBackgroundColor,
-                height: 50, // Set your desired height
+                height: 50,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -85,7 +86,7 @@ class _BottomNavigationViewState
         notifier.setCurrentIndex(itemIndex);
       },
       child: Container(
-        padding: const EdgeInsets.all(10), // Make the clickable area larger
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: isActive ? ColorUtils.blueColor.withOpacity(0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(15),
@@ -108,7 +109,7 @@ class _BottomNavigationViewState
         notifier.setCurrentIndex(itemIndex);
       },
       child: Container(
-        padding: const EdgeInsets.all(10), // Make the clickable area larger
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: isActive ? ColorUtils.blueColor.withOpacity(0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(15),
@@ -119,7 +120,7 @@ class _BottomNavigationViewState
             isActive ? ColorUtils.blueColor : ColorUtils.primaryColor,
             BlendMode.srcIn,
           ),
-          height: 24, // Control the icon size
+          height: 24,
         ),
       ),
     );

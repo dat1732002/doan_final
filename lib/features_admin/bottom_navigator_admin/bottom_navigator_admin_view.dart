@@ -3,6 +3,7 @@ import 'package:ecommerce_flutter/features_admin/order_management/order_manageme
 import 'package:ecommerce_flutter/features_admin/product_management/product_management_view.dart';
 import 'package:ecommerce_flutter/features_admin/statistical_management/statistical_management_view.dart';
 import 'package:ecommerce_flutter/features_member/bottom_navigator_member/notifier/bottom_navigation_notifier.dart';
+import 'package:ecommerce_flutter/features_member/profile/profile_view.dart';
 import 'package:ecommerce_flutter/utils/assets_utils.dart';
 import 'package:ecommerce_flutter/utils/color_utils.dart';
 import 'package:flutter/material.dart';
@@ -16,11 +17,11 @@ class BottomNavigationAdminView extends ConsumerStatefulWidget {
 
   @override
   BaseStateDelegate<BottomNavigationAdminView, BottomNavigationNotifier>
-      createState() => _BottomNavigationViewState();
+  createState() => _BottomNavigationViewState();
 }
 
-class _BottomNavigationViewState extends BaseStateDelegate<
-    BottomNavigationAdminView, BottomNavigationNotifier> {
+class _BottomNavigationViewState
+    extends BaseStateDelegate<BottomNavigationAdminView, BottomNavigationNotifier> {
   final PageController _pageController = PageController(initialPage: 0);
 
   @override
@@ -31,16 +32,11 @@ class _BottomNavigationViewState extends BaseStateDelegate<
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: Colors.white,
-        child: Consumer(
-          builder: (context, ref, child) {
-            ref.watch(
-              bottomNavigationNotifierProvider.select(
-                (value) => value.currentIndex,
-              ),
-            );
-            return PageView(
+      resizeToAvoidBottomInset: false,
+      body: Column(
+        children: [
+          Expanded(
+            child: PageView(
               physics: const NeverScrollableScrollPhysics(),
               controller: _pageController,
               children: const [
@@ -48,114 +44,82 @@ class _BottomNavigationViewState extends BaseStateDelegate<
                 ProductManagementView(),
                 OrderManagementView(),
                 StatisticalManagementView(),
+                ProfileView(),
               ],
-            );
-          },
-        ),
-      ),
-      bottomNavigationBar: Container(
-        color: ColorUtils.primaryBackgroundColor,
-        child: BottomAppBar(
-          clipBehavior: Clip.antiAliasWithSaveLayer,
-          padding: const EdgeInsets.all(0),
-          shape: AutomaticNotchedShape(
-            const RoundedRectangleBorder(),
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(25),
             ),
           ),
-          child: Consumer(
+          Consumer(
             builder: (context, ref, child) {
               final index = ref.watch(
-                bottomNavigationNotifierProvider.select(
-                  (value) => value.currentIndex,
-                ),
+                bottomNavigationNotifierProvider.select((value) => value.currentIndex),
               );
-              return BottomNavigationBar(
-                items: <BottomNavigationBarItem>[
-                  BottomNavigationBarItem(
-                    icon: SvgPicture.asset(
-                      AssetUtils.profile,
-                      colorFilter: ColorFilter.mode(
-                        ColorUtils.primaryColor,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    activeIcon: SvgPicture.asset(
-                      AssetUtils.profileActive,
-                      colorFilter: ColorFilter.mode(
-                        ColorUtils.blueColor,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    label: "account_management_view",
-                  ),
-                  BottomNavigationBarItem(
-                    icon: SvgPicture.asset(
-                      AssetUtils.product,
-                      colorFilter: ColorFilter.mode(
-                        ColorUtils.primaryColor,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    activeIcon: SvgPicture.asset(
-                      AssetUtils.productActive,
-                      colorFilter: ColorFilter.mode(
-                        ColorUtils.blueColor,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    label: "product_management_view",
-                  ),
-                  BottomNavigationBarItem(
-                    icon: SvgPicture.asset(
-                      AssetUtils.order,
-                      colorFilter: ColorFilter.mode(
-                        ColorUtils.primaryColor,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    activeIcon: SvgPicture.asset(
-                      AssetUtils.orderActive,
-                      colorFilter: ColorFilter.mode(
-                        ColorUtils.blueColor,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    label: "Order",
-                  ),
-                  BottomNavigationBarItem(
-                    icon: SvgPicture.asset(
-                      AssetUtils.chart,
-                      colorFilter: ColorFilter.mode(
-                        ColorUtils.primaryColor,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    activeIcon: SvgPicture.asset(
-                      AssetUtils.chartActive,
-                      colorFilter: ColorFilter.mode(
-                        ColorUtils.blueColor,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    label: "chart",
-                  ),
-                ],
-                backgroundColor: ColorUtils.whiteColor,
-                selectedItemColor: ColorUtils.blueColor,
-                unselectedItemColor: ColorUtils.primaryColor,
-                showSelectedLabels: false,
-                showUnselectedLabels: false,
-                currentIndex: index,
-                type: BottomNavigationBarType.fixed,
-                onTap: (value) => {
-                  _pageController.jumpToPage(value),
-                  notifier.setCurrentIndex(value),
-                },
+              return Container(
+                color: ColorUtils.primaryBackgroundColor,
+                height: 50,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildNavItem(Icons.manage_accounts_outlined,Icons.manage_accounts,'Account',0,index),
+                    _buildNavItemWithSvg(
+                        AssetUtils.product, AssetUtils.productActive, "Products", 1, index),
+                    _buildNavItemWithSvg(
+                        AssetUtils.order, AssetUtils.orderActive, "Orders", 2, index),
+                    _buildNavItemWithSvg(
+                        AssetUtils.chart, AssetUtils.chartActive, "Statistics", 3, index),
+                    _buildNavItemWithSvg(
+                        AssetUtils.profile, AssetUtils.profileActive, "Profile", 4, index),
+                  ],
+                ),
               );
             },
           ),
+        ],
+      ),
+    );
+  }
+  Widget _buildNavItem(IconData icon, IconData activeIcon, String label, int itemIndex,
+      int currentIndex) {
+    final isActive = currentIndex == itemIndex;
+    return GestureDetector(
+      onTap: () {
+        _pageController.jumpToPage(itemIndex);
+        notifier.setCurrentIndex(itemIndex);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: isActive ? ColorUtils.blueColor.withOpacity(0.1) : Colors.transparent,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Icon(
+          isActive ? activeIcon : icon,
+          color: isActive ? ColorUtils.blueColor : ColorUtils.primaryColor,
+          size: 28,
+        ),
+      ),
+    );
+  }
+  Widget _buildNavItemWithSvg(
+      String icon, String activeIcon, String label, int itemIndex, int currentIndex) {
+    final isActive = currentIndex == itemIndex;
+    return GestureDetector(
+      onTap: () {
+        _pageController.jumpToPage(itemIndex);
+        notifier.setCurrentIndex(itemIndex);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: isActive ? ColorUtils.blueColor.withOpacity(0.1) : Colors.transparent,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: SvgPicture.asset(
+          isActive ? activeIcon : icon,
+          colorFilter: ColorFilter.mode(
+            isActive ? ColorUtils.blueColor : ColorUtils.primaryColor,
+            BlendMode.srcIn,
+          ),
+          height: 24,
         ),
       ),
     );

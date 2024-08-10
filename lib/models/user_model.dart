@@ -6,6 +6,7 @@ class UserModel {
   final String dateOfBirth;
   final String role;
   final String address;
+  String? profilePictureUrl;
 
   UserModel({
     required this.id,
@@ -15,6 +16,7 @@ class UserModel {
     required this.dateOfBirth,
     required this.role,
     required this.address,
+     this.profilePictureUrl,
   });
 
   Map<String, dynamic> toJson() {
@@ -25,6 +27,7 @@ class UserModel {
       'dateOfBirth': dateOfBirth,
       'role': role,
       'address': address,
+      'profilePictureUrl': profilePictureUrl,
     };
   }
    factory UserModel.fromJson(Map<String, dynamic> data, String id) {
@@ -36,6 +39,7 @@ class UserModel {
       dateOfBirth: data['dateOfBirth'] ?? '',
       role: data['role'] ?? '',
       address: data['address'] ?? '',
+      profilePictureUrl: data['profilePictureUrl']??'',
     );
   }
 }
