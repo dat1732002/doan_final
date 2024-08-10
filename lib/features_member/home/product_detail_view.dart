@@ -151,13 +151,14 @@ class ProductDetailView extends HookWidget {
                         Container(
                           width: 70,
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black12)
+                            border: Border.all(color: Colors.black12),
                           ),
-                          padding: EdgeInsets.only(left: 6,right: 6),
+                          padding: EdgeInsets.only(left: 10, right: 6),
                           child: DropdownButton<String>(
                             value: selectedSize.value,
                             hint: Text('Size'),
                             isExpanded: true,
+                            underline: SizedBox.shrink(), // This removes the underline
                             items: updatedProduct.value.availableSizes.map((String size) {
                               return DropdownMenuItem<String>(
                                 value: size,
@@ -169,6 +170,7 @@ class ProductDetailView extends HookWidget {
                             },
                           ),
                         ),
+
                       ],
                     ),
                     SizedBox(height: 16.h),

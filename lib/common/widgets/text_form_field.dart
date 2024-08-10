@@ -70,6 +70,13 @@ class TextFormFieldCustomWidget extends StatelessWidget {
                 width: 1,
               ),
             ),
+            disabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20),
+              borderSide: BorderSide(
+                color: ColorUtils.blueLightColor.withOpacity(0.2),
+                width: 1,
+              ),
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20),
               borderSide: BorderSide(

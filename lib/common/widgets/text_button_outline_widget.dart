@@ -20,7 +20,7 @@ class TextButtonOutlineWidget extends StatelessWidget {
           (states) => ColorUtils.whiteColor,
         ),
         minimumSize: MaterialStateProperty.resolveWith(
-          (states) => const Size(double.infinity, 60),
+          (states) => const Size(double.infinity, 40),
         ),
         shape: MaterialStateProperty.resolveWith(
           (states) => RoundedRectangleBorder(

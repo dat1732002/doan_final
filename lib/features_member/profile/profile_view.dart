@@ -42,7 +42,7 @@ class ProfileView extends HookWidget {
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: ColorUtils.primaryBackgroundColor,
+      backgroundColor: ColorUtils.whiteColor,
       appBar: AppBar(
         backgroundColor: ColorUtils.primaryColor,
         title: Text(

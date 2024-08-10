@@ -93,7 +93,7 @@ class HomeView extends HookWidget {
         appBar: AppBar(
           backgroundColor: ColorUtils.primaryColor,
           title: Text(
-            'Home',
+            'Tất cả sản phẩm',
             style: TextStyle(
               color: ColorUtils.whiteColor,
               fontSize: 24.sp,
@@ -115,7 +115,7 @@ class HomeView extends HookWidget {
         appBar: AppBar(
           backgroundColor: ColorUtils.primaryColor,
           title: Text(
-            'Home',
+            'Tất cả sản phẩm',
             style: TextStyle(
               color: ColorUtils.whiteColor,
               fontSize: 24.sp,
@@ -133,13 +133,13 @@ class HomeView extends HookWidget {
           ],
         ),
         body: Padding(
-          padding: const EdgeInsets.all(10.0),
+          padding: const EdgeInsets.fromLTRB(10.0,10,10,0),
           child: Column(
             children: [
               Padding(
                 padding: EdgeInsets.only(bottom: 10.0,),
                 child: SearchFormField(
-                  hint: 'Search products',
+                  hint: 'Tìm kiếm',
                   controller: searchController,
                   onChanged: searchProducts,
                   prefixIcon: Icon(Icons.search),
@@ -150,7 +150,7 @@ class HomeView extends HookWidget {
                   padding: EdgeInsets.symmetric(horizontal: 8.0),
                   child: Row(
                     children: [
-                      Text('Filtered by: ${selectedCategory.value!.name}'),
+                      Text('Lọc theo ${selectedCategory.value!.name}'),
                       IconButton(
                         icon: Icon(Icons.close),
                         onPressed: () {

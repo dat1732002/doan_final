@@ -26,11 +26,11 @@ class OrderView extends HookWidget {
     });
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
         backgroundColor: ColorUtils.primaryColor,
         title: Text(
-          'My Orders',
+          'Lịch sử đơn hàng',
           style: TextStyle(
             color: ColorUtils.whiteColor,
             fontSize: 24.sp,
@@ -48,7 +48,7 @@ class OrderView extends HookWidget {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No orders found.'));
+            return Center(child: Text('Không có đơn hàng nào.'));
           }
 
           final orders = snapshot.data!;
@@ -88,24 +88,34 @@ class OrderView extends HookWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Order: ${order.items[0].productName}',
+                              'Đơn hàng: ${order.items[0].productName}',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             SizedBox(height: 4),
-                            Text('Status: ${order.status}',
-                                style: TextStyle(
-                                  color: order.status.toLowerCase() == 'accepted'
-                                      ? Colors.green
-                                      : Colors.deepOrangeAccent,
-                                )),
+                            Row(
+                              children: [
+                                Text('Trạng thái: ',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                    )),
+                                Text(order.status.toLowerCase() == 'accepted'
+                                    ? 'Thành công'
+                                    : 'Chờ xác nhận',
+                                    style: TextStyle(
+                                      color: order.status.toLowerCase() == 'accepted'
+                                          ? Colors.green
+                                          : Colors.deepOrangeAccent,
+                                    )),
+                              ],
+                            ),
                             SizedBox(height: 4),
-                            Text('Date: ${DateFormat('dd/MM/yyyy (HH:mm)').format(order.createdAt)}'),
+                            Text('Ngày đặt: ${DateFormat('dd/MM/yyyy (HH:mm)').format(order.createdAt)}'),
                             SizedBox(height: 4),
                             Text(
-                                'Total: ${order.totalAmount.toStringAsFixed(0)}\$'),
+                                'Tổng tiền: ${order.totalAmount.toStringAsFixed(0)}\$'),
                           ],
                         ),
                       ),

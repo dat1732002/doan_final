@@ -94,10 +94,12 @@ class CartView extends HookWidget {
 
     if (isLoading.value) {
       return Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
           backgroundColor: ColorUtils.primaryColor,
+          centerTitle: true,
           title: Text(
-            'Cart',
+            'Giỏ hàng',
             style: TextStyle(
               color: ColorUtils.whiteColor,
               fontSize: 24.sp,
@@ -110,10 +112,12 @@ class CartView extends HookWidget {
     }
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        centerTitle: true,
         backgroundColor: ColorUtils.primaryColor,
         title: Text(
-          'Cart',
+          'Giỏ hàng',
           style: TextStyle(
             color: ColorUtils.whiteColor,
             fontSize: 24.sp,
@@ -122,7 +126,7 @@ class CartView extends HookWidget {
         ),
       ),
       body: cartItems.value.isEmpty
-          ? Center(child: Text('Your cart is empty.'))
+          ? Center(child: Text('Giỏ hàng của bạn đang trống.'))
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -139,12 +143,12 @@ class CartView extends HookWidget {
                             return ListTile(
                                 title: Text('Error fetching product details'));
                           } else if (!snapshot.hasData) {
-                            return ListTile(title: Text('Product not found'));
+                            return ListTile(title: Text('Không tìm thấy sản phẩm'));
                           } else {
                             final product = snapshot.data!;
                             return Container(
                               margin: EdgeInsets.symmetric(
-                                  vertical: 10.h, horizontal: 10.w),
+                                  vertical: 5.h, horizontal: 10.w),
                               padding: EdgeInsets.only(left: 10.h),
                               decoration: BoxDecoration(
                                 color: Colors.white,
@@ -182,7 +186,7 @@ class CartView extends HookWidget {
                                               fontWeight: FontWeight.bold),
                                         ),
                                         Text(
-                                          'Price: ${item.price} USD',
+                                          'Giá: ${item.price} USD',
                                           style: TextStyle(fontSize: 16.sp),
                                         ),
                                         Text(
@@ -190,7 +194,7 @@ class CartView extends HookWidget {
                                           style: TextStyle(fontSize: 16.sp),
                                         ),
                                         Text(
-                                          'Quantity: ${item.quantity}',
+                                          'Số lượng: ${item.quantity}',
                                           style: TextStyle(fontSize: 16.sp),
                                         ),
                                       ],
@@ -241,17 +245,19 @@ class CartView extends HookWidget {
                     },
                   ),
                 ),
-                Padding(
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border(top: BorderSide(color: Colors.white12))
+                  ),
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Total: ${totalAmount.value.toStringAsFixed(0)} USD',
+                        'Tổng: ${totalAmount.value.toStringAsFixed(0)} USD',
                         style: TextStyle(
                             fontSize: 18.sp, fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(height: 8.h),
                       TextButtonOutlineWidget(
                         onPressed: () async {
                           await orderService.moveCartToOrders(cartItems.value);
@@ -259,10 +265,10 @@ class CartView extends HookWidget {
                           cartItems.value.clear();
                           totalAmount.value = 0.0;
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text('Order placed successfully!'),
+                            content: Text('Đặt hàng thành công!'),
                           ));
                         },
-                        label: 'Place Order',
+                        label: 'Đặt hàng',
                       ),
                     ],
                   ),

@@ -68,6 +68,7 @@ class _SignUpViewState extends State<SignUpView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Padding(
@@ -87,7 +88,7 @@ class _SignUpViewState extends State<SignUpView> {
                   ),
                 ),
                 Text(
-                  'Enter your account to continue',
+                  'Nhập thông tin để tiếp tục',
                   style: TextStyle(
                     color: ColorUtils.textColor,
                     fontSize: 14,
@@ -95,8 +96,8 @@ class _SignUpViewState extends State<SignUpView> {
                 ),
                 SizedBox(height: 10.h),
                 TextFormFieldCustomWidget(
-                  hint: 'Your full name',
-                  label: "Full name",
+                  hint: 'Họ và tên',
+                  label: "Tên đầy đủ",
                   controller: _nameController,
                   inputAction: TextInputAction.next,
                   validator: (value) {
@@ -108,8 +109,8 @@ class _SignUpViewState extends State<SignUpView> {
                 ),
                 SizedBox(height: 20.h),
                 TextFormFieldCustomWidget(
-                  hint: 'Your email address',
-                  label: "Email address",
+                  hint: 'Email của bạn',
+                  label: "Email",
                   inputAction: TextInputAction.next,
                   controller: _emailController,
                   validator: (value) {
@@ -124,8 +125,8 @@ class _SignUpViewState extends State<SignUpView> {
                 ),
                 SizedBox(height: 20.h),
                 TextFormFieldCustomWidget(
-                  hint: 'Your phone number',
-                  label: "Phone number",
+                  hint: 'Số điện thoại của bạn',
+                  label: "Số điện thoại",
                   inputAction: TextInputAction.next,
                   controller: _phoneController,
                   textInputType: TextInputType.phone,
@@ -138,8 +139,8 @@ class _SignUpViewState extends State<SignUpView> {
                 ),
                 SizedBox(height: 20.h),
                 TextFormFieldCustomWidget(
-                  hint: 'Your address',
-                  label: "Address",
+                  hint: 'Địa chỉ của bạn',
+                  label: "Địa chỉ",
                   inputAction: TextInputAction.next,
                   controller: _addressController,
                   validator: (value) {
@@ -151,8 +152,8 @@ class _SignUpViewState extends State<SignUpView> {
                 ),
                 SizedBox(height: 20.h),
                 TextFormFieldCustomWidget(
-                  hint: 'Your password',
-                  label: "Password",
+                  hint: 'Mật khẩu của bạn',
+                  label: "Mật khẩu",
                   controller: _passwordController,
                   inputAction: TextInputAction.done,
                   obscureText: !_isPasswordVisible,
@@ -180,7 +181,7 @@ class _SignUpViewState extends State<SignUpView> {
                 ),
                 SizedBox(height: 20.h),
                 TextButtonWidget(
-                  label: 'Register',
+                  label: 'ĐĂNG KÝ',
                   onPressed: _register,
                 ),
                 SizedBox(height: 10.h),
@@ -215,7 +216,7 @@ class _SignUpViewState extends State<SignUpView> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Already have an account? ',
+                        'Bạn có tài khoản rồi? ',
                         style: TextStyle(
                           color: ColorUtils.textColor,
                           fontSize: 14,
@@ -224,7 +225,7 @@ class _SignUpViewState extends State<SignUpView> {
                       GestureDetector(
                         onTap: () => Routes.goToSignInScreen(context),
                         child: Text(
-                          'Login',
+                          'Đăng nhập',
                           style: TextStyle(
                             color: ColorUtils.primaryColor,
                             fontWeight: FontWeight.bold,

@@ -69,6 +69,7 @@ class _SignInViewState extends State<SignInView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Padding(
@@ -80,14 +81,14 @@ class _SignInViewState extends State<SignInView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Welcome back to Ecommerce',
+                  'Welcome to TD Sneakers',
                   style: TextStyle(
                       color: ColorUtils.primaryColor,
                       fontSize: 20.sp,
                       fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  'Enter your account to continue',
+                  'Đăng nhập tài khoản để tiếp tục',
                   style: TextStyle(
                     color: ColorUtils.textColor,
                     fontSize: 14,
@@ -100,8 +101,8 @@ class _SignInViewState extends State<SignInView> {
                   height: 20.h,
                 ),
                 TextFormFieldCustomWidget(
-                  hint: 'Your email address',
-                  label: "Email address",
+                  hint: 'Email của bạn',
+                  label: "Email",
                   inputAction: TextInputAction.next,
                   controller: _emailController,
                 ),
@@ -109,8 +110,8 @@ class _SignInViewState extends State<SignInView> {
                   height: 20.h,
                 ),
                 TextFormFieldCustomWidget(
-                  hint: 'Your password',
-                  label: "Password",
+                  hint: 'Mật khẩu của bạn',
+                  label: "Mật khẩu",
                   controller: _passwordController,
                   inputAction: TextInputAction.done,
                   obscureText: !_isPasswordVisible,
@@ -131,7 +132,7 @@ class _SignInViewState extends State<SignInView> {
                   height: 50.h,
                 ),
                 TextButtonWidget(
-                  label: 'Login',
+                  label: 'ĐĂNG NHẬP',
                   onPressed: _login,
                 ),
                 SizedBox(
@@ -170,7 +171,7 @@ class _SignInViewState extends State<SignInView> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Didn\'t you have an account? ',
+                        'Bạn đã có tài khoản chưa? ',
                         style: TextStyle(
                           color: ColorUtils.textColor,
                           fontSize: 14,
@@ -179,7 +180,7 @@ class _SignInViewState extends State<SignInView> {
                       GestureDetector(
                         onTap: () => Routes.goToSignUpScreen(context),
                         child: Text(
-                          'Register',
+                          'Đăng ký',
                           style: TextStyle(
                             color: ColorUtils.primaryColor,
                             fontWeight: FontWeight.bold,

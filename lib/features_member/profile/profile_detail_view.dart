@@ -60,9 +60,23 @@ class ProfileDetailView extends HookWidget {
     }
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Account Profile'),
-        backgroundColor: ColorUtils.primaryBackgroundColor,
+        backgroundColor: ColorUtils.primaryColor,
+        title: Text('Thông tin cá nhân',style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600
+        ),),
+        centerTitle: true,
+        leading: InkWell(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
+        ),
       ),
       body: isLoading.value
           ? const Center(child: CircularProgressIndicator())
@@ -75,7 +89,7 @@ class ProfileDetailView extends HookWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     TextFormFieldCustomWidget(
-                      label: 'Name',
+                      label: 'Tên',
                       controller: nameController,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -86,7 +100,7 @@ class ProfileDetailView extends HookWidget {
                     ),
                     const SizedBox(height: 20),
                     TextFormFieldCustomWidget(
-                      label: 'Phone',
+                      label: 'Số điện thoại',
                       controller: phoneController,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -109,7 +123,7 @@ class ProfileDetailView extends HookWidget {
                     ),
                     const SizedBox(height: 20),
                     TextFormFieldCustomWidget(
-                      label: 'Date of Birth',
+                      label: 'Ngày sinh',
                       controller: dobController,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -120,7 +134,7 @@ class ProfileDetailView extends HookWidget {
                     ),
                     const SizedBox(height: 20),
                     TextFormFieldCustomWidget(
-                      label: 'Address',
+                      label: 'Địa chỉ',
                       controller: addressController,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -129,9 +143,9 @@ class ProfileDetailView extends HookWidget {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 50),
+                    const SizedBox(height: 40),
                     TextButtonWidget(
-                      label: 'Update',
+                      label: 'CẬP NHẬT THÔNG TIN',
                       onPressed: _updateUser,
                     ),
                   ],

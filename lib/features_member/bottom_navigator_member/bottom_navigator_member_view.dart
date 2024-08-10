@@ -17,7 +17,7 @@ class BottomNavigationMemberView extends ConsumerStatefulWidget {
 
   @override
   BaseStateDelegate<BottomNavigationMemberView, BottomNavigationNotifier>
-      createState() => _BottomNavigationViewState();
+  createState() => _BottomNavigationViewState();
 }
 
 class _BottomNavigationViewState
@@ -32,16 +32,10 @@ class _BottomNavigationViewState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: Colors.white,
-        child: Consumer(
-          builder: (context, ref, child) {
-            ref.watch(
-              bottomNavigationNotifierProvider.select(
-                (value) => value.currentIndex,
-              ),
-            );
-            return PageView(
+      body: Column(
+        children: [
+          Expanded(
+            child: PageView(
               physics: const NeverScrollableScrollPhysics(),
               controller: _pageController,
               children:  [
@@ -51,122 +45,81 @@ class _BottomNavigationViewState
                 OrderView(),
                 ProfileView(),
               ],
-            );
-          },
-        ),
-      ),
-      bottomNavigationBar: Container(
-        color: ColorUtils.primaryBackgroundColor,
-        child: BottomAppBar(
-          clipBehavior: Clip.antiAliasWithSaveLayer,
-          padding: const EdgeInsets.all(0),
-          shape: AutomaticNotchedShape(
-            const RoundedRectangleBorder(),
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(25),
             ),
           ),
-          child: Consumer(
+          Consumer(
             builder: (context, ref, child) {
               final index = ref.watch(
-                bottomNavigationNotifierProvider.select(
-                  (value) => value.currentIndex,
-                ),
+                bottomNavigationNotifierProvider.select((value) => value.currentIndex),
               );
-              return BottomNavigationBar(
-                items: <BottomNavigationBarItem>[
-                  BottomNavigationBarItem(
-                    icon: Icon(
-                Icons.info_outline
-              ),
-                    activeIcon: Icon(
-                        Icons.info
-                    ),
-                    label: "intro",
-                  ),
-                  BottomNavigationBarItem(
-                    icon: SvgPicture.asset(
-                      AssetUtils.home,
-                      colorFilter: ColorFilter.mode(
-                        ColorUtils.primaryColor,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    activeIcon: SvgPicture.asset(
-                      AssetUtils.homeActive,
-                      colorFilter: ColorFilter.mode(
-                        ColorUtils.blueColor,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    label: "home",
-                  ),
-                  BottomNavigationBarItem(
-                    icon: SvgPicture.asset(
-                      AssetUtils.cart,
-                      colorFilter: ColorFilter.mode(
-                        ColorUtils.primaryColor,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    activeIcon: SvgPicture.asset(
-                      AssetUtils.cartActive,
-                      colorFilter: ColorFilter.mode(
-                        ColorUtils.blueColor,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    label: "Cart",
-                  ),
-                  BottomNavigationBarItem(
-                    icon: SvgPicture.asset(
-                      AssetUtils.order,
-                      colorFilter: ColorFilter.mode(
-                        ColorUtils.primaryColor,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    activeIcon: SvgPicture.asset(
-                      AssetUtils.orderActive,
-                      colorFilter: ColorFilter.mode(
-                        ColorUtils.blueColor,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    label: "Order",
-                  ),
-                  BottomNavigationBarItem(
-                    icon: SvgPicture.asset(
-                      AssetUtils.profile,
-                      colorFilter: ColorFilter.mode(
-                        ColorUtils.primaryColor,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    activeIcon: SvgPicture.asset(
-                      AssetUtils.profileActive,
-                      colorFilter: ColorFilter.mode(
-                        ColorUtils.blueColor,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    label: "profile",
-                  ),
-                ],
-                backgroundColor: ColorUtils.whiteColor,
-                selectedItemColor: ColorUtils.blueColor,
-                unselectedItemColor: ColorUtils.primaryColor,
-                showSelectedLabels: false,
-                showUnselectedLabels: false,
-                currentIndex: index,
-                type: BottomNavigationBarType.fixed,
-                onTap: (value) => {
-                  _pageController.jumpToPage(value),
-                  notifier.setCurrentIndex(value),
-                },
+              return Container(
+                color: ColorUtils.primaryBackgroundColor,
+                height: 50, // Set your desired height
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildNavItem(Icons.info_outline, Icons.info, "Intro", 0, index),
+                    _buildNavItem(Icons.warehouse_outlined, Icons.warehouse_rounded, "Home", 1, index),
+                    _buildNavItemWithSvg(
+                        AssetUtils.cart, AssetUtils.cartActive, "Cart", 2, index),
+                    _buildNavItemWithSvg(
+                        AssetUtils.order, AssetUtils.orderActive, "Order", 3, index),
+                    _buildNavItemWithSvg(
+                        AssetUtils.profile, AssetUtils.profileActive, "Profile", 4, index),
+                  ],
+                ),
               );
             },
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem(IconData icon, IconData activeIcon, String label, int itemIndex,
+      int currentIndex) {
+    final isActive = currentIndex == itemIndex;
+    return GestureDetector(
+      onTap: () {
+        _pageController.jumpToPage(itemIndex);
+        notifier.setCurrentIndex(itemIndex);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(10), // Make the clickable area larger
+        decoration: BoxDecoration(
+          color: isActive ? ColorUtils.blueColor.withOpacity(0.1) : Colors.transparent,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Icon(
+          isActive ? activeIcon : icon,
+          color: isActive ? ColorUtils.blueColor : ColorUtils.primaryColor,
+          size: 24,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItemWithSvg(
+      String icon, String activeIcon, String label, int itemIndex, int currentIndex) {
+    final isActive = currentIndex == itemIndex;
+    return GestureDetector(
+      onTap: () {
+        _pageController.jumpToPage(itemIndex);
+        notifier.setCurrentIndex(itemIndex);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(10), // Make the clickable area larger
+        decoration: BoxDecoration(
+          color: isActive ? ColorUtils.blueColor.withOpacity(0.1) : Colors.transparent,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: SvgPicture.asset(
+          isActive ? activeIcon : icon,
+          colorFilter: ColorFilter.mode(
+            isActive ? ColorUtils.blueColor : ColorUtils.primaryColor,
+            BlendMode.srcIn,
+          ),
+          height: 24, // Control the icon size
         ),
       ),
     );

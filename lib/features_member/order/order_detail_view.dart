@@ -102,10 +102,16 @@ class OrderDetailsView extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: TextStyle(fontWeight: FontWeight.w500)),
-          Text(value,
+          Text(value.toLowerCase() == 'accepted'
+              ? 'Thành công'
+              : value.toLowerCase() == 'pending'
+              ? 'Chờ xác nhận'
+              : value,
               style: TextStyle(
                 color: value.toLowerCase() == 'accepted'
                     ? Colors.green
+                    : value.toLowerCase() == 'pending'
+                    ? Colors.red
                     : Colors.black,
               )),
         ],

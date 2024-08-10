@@ -36,7 +36,7 @@ class AccountManagementView extends HookWidget {
     if (isLoading.value) {
       return Scaffold(
         resizeToAvoidBottomInset: true,
-        backgroundColor: ColorUtils.primaryBackgroundColor,
+        backgroundColor: ColorUtils.whiteColor,
         appBar: AppBar(
           backgroundColor: ColorUtils.primaryBackgroundColor,
           title: Text(
@@ -62,13 +62,13 @@ class AccountManagementView extends HookWidget {
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: ColorUtils.primaryBackgroundColor,
+      backgroundColor: ColorUtils.whiteColor,
       appBar: AppBar(
-        backgroundColor: ColorUtils.primaryBackgroundColor,
+        backgroundColor: ColorUtils.primaryColor,
         title: Text(
           'Account Management',
           style: TextStyle(
-            color: ColorUtils.primaryColor,
+            color: ColorUtils.whiteColor,
             fontSize: 24.sp,
             fontWeight: FontWeight.bold,
           ),
@@ -78,7 +78,7 @@ class AccountManagementView extends HookWidget {
               onPressed: () {
                 Routes.goToSignInScreen(context);
               },
-              icon: Icon(Icons.logout))
+              icon: Icon(Icons.logout,color: Colors.white,))
         ],
       ),
       body: ListView.builder(
