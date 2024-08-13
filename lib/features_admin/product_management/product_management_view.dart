@@ -51,7 +51,7 @@ class ProductManagementView extends HookWidget {
       bool matchesSearch =
           product.name.toLowerCase().contains(searchQuery.value.toLowerCase());
       bool matchesCategory = selectedCategory.value == null ||
-          product.category == selectedCategory.value!.id;
+          product.category == selectedCategory.value!.name;
       return matchesSearch && matchesCategory;
     }).toList();
 
