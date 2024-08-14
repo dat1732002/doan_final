@@ -53,7 +53,6 @@ dependencies:
   rxdart: ^0.27.7
   fl_chart: ^0.68.0
   carousel_slider: ^4.2.1
-  firebase_admin: any
 
 dev_dependencies:
   flutter_test:

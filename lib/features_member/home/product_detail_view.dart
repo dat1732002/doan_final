@@ -11,7 +11,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class ProductDetailView extends HookWidget {
   final ProductModel product;
   final bool isAdmin;
-  const ProductDetailView({Key? key, required this.product,required this.isAdmin}) : super(key: key);
+  const ProductDetailView({
+    Key? key,
+    required this.product,
+    required this.isAdmin,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +26,7 @@ class ProductDetailView extends HookWidget {
     final userService = UserService();
     final productService = ProductService();
     final updatedProduct = useState<ProductModel>(product);
-    final selectedSize = useState<String?>(null);
+    final selectedSize = useState<Map<String, int>?>(null);
 
     useEffect(() {
       Future<void> fetchData() async {
@@ -30,7 +34,7 @@ class ProductDetailView extends HookWidget {
         currentUserId.value = userId;
 
         ProductModel? latestProduct =
-            await productService.fetchProductDetails(product.id);
+        await productService.fetchProductDetails(product.id);
         if (latestProduct != null) {
           updatedProduct.value = latestProduct;
         }
@@ -46,10 +50,10 @@ class ProductDetailView extends HookWidget {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: ColorUtils.primaryColor,
-        title: Text('Chi tiết sản phẩm',style: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.w600
-        ),),
+        title: Text(
+          'Chi tiết sản phẩm',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+        ),
         centerTitle: true,
         leading: InkWell(
           onTap: () {
@@ -64,133 +68,149 @@ class ProductDetailView extends HookWidget {
       body: isLoading.value
           ? Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.all(10.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                      child: Image.network(
-                        product.imageUrl,
-                        width: double.infinity,
-                        height: 200.h,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    SizedBox(height: 16.h),
-                    Text(
-                      product.name,
-                      style: TextStyle(
-                          fontSize: 24.sp, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 8.h),
-                    Text(
-                      '${product.price} USD',
-                      style: TextStyle(fontSize: 20.sp, color: Colors.green),
-                    ),
-                    SizedBox(height: 8.h),
-                    Text(
-                      product.description,
-                      style: TextStyle(fontSize: 16.sp,
-                      fontStyle: FontStyle.italic),
-                    ),
-                    if(!isAdmin)
-                      Row(
-                      children: [
-                        Text('Số lượng: ', style: TextStyle(fontSize: 16.sp,fontWeight: FontWeight.w500)),
-                        IconButton(
-                          icon: Icon(Icons.remove,color: Colors.red,),
-                          onPressed: () {
-                            if (quantity.value > 1) {
-                              quantity.value--;
-                            }
-                          },
-                        ),
-                        Text('${quantity.value}'),
-                        IconButton(
-                          icon: Icon(Icons.add,color: Colors.green,),
-                          onPressed: () {
-                            quantity.value++;
-                          },
-                        ),
-                      ],
-                    ),
-                    if(!isAdmin)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        InkWell(
-                          onTap:selectedSize.value != null
-                              ? () async {
-                            final cartItem = CartItemModel(
-                              productId: product.id,
-                              quantity: quantity.value,
-                              imageUrl: product.imageUrl,
-                              productName: product.name,
-                              price: product.price,
-                              size: selectedSize.value!,
-                            );
-                            await cartService.addOrUpdateCartItem(
-                                currentUserId.value, cartItem);
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text('Đã thêm vào giỏ hàng!'),
-                            ));
-                          }
-                              : null,
-                          child: Container(
-                            padding: EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                                color: Colors.green,
-                                borderRadius: BorderRadius.circular(30),
-                                border: Border.all(color: Colors.black12)
-                            ),
-                            child: Text('Thêm vào giỏ hàng',style: TextStyle(
-                                color: Colors.white
-                            ),),
-                          ),
-                        ),
-                        Container(
-                          width: 70,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black12),
-                          ),
-                          padding: EdgeInsets.only(left: 10, right: 6),
-                          child: DropdownButton<String>(
-                            value: selectedSize.value,
-                            hint: Text('Size'),
-                            isExpanded: true,
-                            underline: SizedBox.shrink(), // This removes the underline
-                            items: updatedProduct.value.availableSizes.map((String size) {
-                              return DropdownMenuItem<String>(
-                                value: size,
-                                child: Text(size),
-                              );
-                            }).toList(),
-                            onChanged: (String? newValue) {
-                              selectedSize.value = newValue;
-                            },
-                          ),
-                        ),
-
-                      ],
-                    ),
-                    SizedBox(height: 16.h),
-                    Text(
-                      'Bình luận',
-                      style: TextStyle(
-                          fontSize: 20.sp, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 8.h),
-                    CommentsList(
-                      comments: updatedProduct.value.commentsList,
-                      userService: userService,
-                    ),
-                    SizedBox(height: 16.h),
-                  ],
+        child: Padding(
+          padding: EdgeInsets.all(10.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                child: Image.network(
+                  product.imageUrl,
+                  width: double.infinity,
+                  height: 200.h,
+                  fit: BoxFit.cover,
                 ),
               ),
-            ),
+              SizedBox(height: 16.h),
+              Text(
+                product.name,
+                style: TextStyle(
+                    fontSize: 24.sp, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                '${product.price} USD',
+                style: TextStyle(fontSize: 20.sp, color: Colors.green),
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                product.description,
+                style: TextStyle(
+                    fontSize: 16.sp, fontStyle: FontStyle.italic),
+              ),
+              if (!isAdmin)
+                Row(
+                  children: [
+                    Text('Số lượng: ',
+                        style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w500)),
+                    IconButton(
+                      icon: Icon(
+                        Icons.remove,
+                        color: Colors.red,
+                      ),
+                      onPressed: () {
+                        if (quantity.value > 1) {
+                          quantity.value--;
+                        }
+                      },
+                    ),
+                    Text('${quantity.value}'),
+                    IconButton(
+                      icon: Icon(
+                        Icons.add,
+                        color: Colors.green,
+                      ),
+                      onPressed: () {
+                        quantity.value++;
+                      },
+                    ),
+                  ],
+                ),
+              if (!isAdmin)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    InkWell(
+                      onTap: selectedSize.value != null
+                          ? () async {
+                        final cartItem = CartItemModel(
+                          productId: product.id,
+                          quantity: quantity.value,
+                          imageUrl: product.imageUrl,
+                          productName: product.name,
+                          price: product.price,
+                          size: selectedSize.value!.keys.first,
+                        );
+                        await cartService.addOrUpdateCartItem(
+                            currentUserId.value, cartItem);
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(SnackBar(
+                          content: Text('Đã thêm vào giỏ hàng!'),
+                        ));
+                      }
+                          : null,
+                      child: Container(
+                        padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                            color: Colors.green,
+                            borderRadius: BorderRadius.circular(30),
+                            border: Border.all(color: Colors.black12)),
+                        child: Text(
+                          'Thêm vào giỏ hàng',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 200, // Adjust width as needed
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black12),
+                      ),
+                      padding: EdgeInsets.only(left: 10, right: 6),
+                      child: DropdownButton<Map<String, int>>(
+                        value: selectedSize.value,
+                        hint: Text('Select Size'),
+                        isExpanded: true,
+                        underline: SizedBox
+                            .shrink(), // This removes the underline
+                        items: updatedProduct.value.availableSizes
+                            .map((sizeMap) {
+                          String size = sizeMap.keys.first;
+                          int quantity = sizeMap[size]!;
+
+                          return DropdownMenuItem<Map<String, int>>(
+                            value: sizeMap,
+                            child: Text('$size - Quantity: $quantity'),
+                          );
+                        }).toList(),
+                        onChanged: (Map<String, int>? newValue) {
+                          if (newValue != null) {
+                            selectedSize.value = newValue;
+                          }
+                        },
+                      ),
+                    )
+                  ],
+                ),
+              SizedBox(height: 16.h),
+              Text(
+                'Bình luận',
+                style: TextStyle(
+                    fontSize: 20.sp, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8.h),
+              CommentsList(
+                comments: updatedProduct.value.commentsList,
+                userService: userService,
+              ),
+              SizedBox(height: 16.h),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -199,40 +219,42 @@ class CommentsList extends HookWidget {
   final List<Comment> comments;
   final UserService userService;
 
-  const CommentsList(
-      {Key? key, required this.comments, required this.userService})
-      : super(key: key);
+  const CommentsList({
+    Key? key,
+    required this.comments,
+    required this.userService,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return comments.isEmpty
         ? Text('Chưa có bình luận nào.',
-            style: TextStyle(fontStyle: FontStyle.italic))
+        style: TextStyle(fontStyle: FontStyle.italic))
         : ListView.builder(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: comments.length,
-            itemBuilder: (context, index) {
-              return FutureBuilder<Map<String, dynamic>>(
-                future: userService.fetchUserDetails(comments[index].userId),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CommentTile(
-                        userName: 'Loading...',
-                        commentText: comments[index].text);
-                  }
-                  if (snapshot.hasError) {
-                    return CommentTile(
-                        userName: 'Error loading user',
-                        commentText: comments[index].text);
-                  }
-                  String userName = snapshot.data?['name'] ?? 'Unknown User';
-                  return CommentTile(
-                      userName: userName, commentText: comments[index].text);
-                },
-              );
-            },
-          );
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      itemCount: comments.length,
+      itemBuilder: (context, index) {
+        return FutureBuilder<Map<String, dynamic>>(
+          future: userService.fetchUserDetails(comments[index].userId),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CommentTile(
+                  userName: 'Loading...',
+                  commentText: comments[index].text);
+            }
+            if (snapshot.hasError) {
+              return CommentTile(
+                  userName: 'Error loading user',
+                  commentText: comments[index].text);
+            }
+            String userName = snapshot.data?['name'] ?? 'Unknown User';
+            return CommentTile(
+                userName: userName, commentText: comments[index].text);
+          },
+        );
+      },
+    );
   }
 }
 
@@ -240,9 +262,11 @@ class CommentTile extends StatelessWidget {
   final String userName;
   final String commentText;
 
-  const CommentTile(
-      {Key? key, required this.userName, required this.commentText})
-      : super(key: key);
+  const CommentTile({
+    Key? key,
+    required this.userName,
+    required this.commentText,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

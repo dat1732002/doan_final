@@ -6,9 +6,31 @@ import 'package:firebase_storage/firebase_storage.dart';
 class ProductService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
-  final List<String> defaultSizes = ['38', '39', '40', '41', '42', '43', '44'];
+  final List<Map<String,int>> defaultSizes = [{'38':0}, {'39':0}, {'40':0}, {'41':0}, {'42':0}, {'43':0}, {'44':0}];
+  Future<void> updateProductQuantity(String productId, String size, int quantity) async {
+    try {
+      DocumentReference productRef = _firestore.collection('products').doc(productId);
+
+      await _firestore.runTransaction((transaction) async {
+        DocumentSnapshot snapshot = await transaction.get(productRef);
+
+        if (!snapshot.exists) {
+          throw Exception("Product not found");
+        }
+
+        Map<String, dynamic> productData = snapshot.data() as Map<String, dynamic>;
+        Map<String, int> availableSizes = Map<String, int>.from(productData['availableSizes'] ?? {});
+
+        availableSizes[size] = quantity;
+
+        transaction.update(productRef, {'availableSizes': availableSizes});
+      });
+    } catch (e) {
+      throw Exception('Error updating product quantity: $e');
+    }
+  }
   Future<void> createProduct(ProductModel product) async {
-    List<String> sizes =
+    List<Map<String,int>> sizes =
         product.availableSizes.isEmpty ? defaultSizes : product.availableSizes;
     try {
       await _firestore.collection('products').add({
@@ -58,7 +80,7 @@ class ProductService {
           price: data['price'],
           imageUrl: data['imageUrl'],
           favoriteUserIds: List<String>.from(data['favoriteUserIds'] ?? []),
-          availableSizes: List<String>.from(data['availableSizes'] ?? []),
+          availableSizes: List<Map<String,int>>.from(data['availableSizes'] ?? []),
         );
       }).toList();
     } catch (e) {
@@ -117,7 +139,7 @@ class ProductService {
           imageUrl: data['imageUrl'],
           favoriteUserIds: List<String>.from(data['favoriteUserIds'] ?? []),
           comments: Map<String, String>.from(data['comments'] ?? {}),
-          availableSizes: List<String>.from(data['availableSizes'] ?? []),
+          availableSizes: List<Map<String,int>>.from(data['availableSizes'] ?? []),
         );
       }
     } catch (e) {

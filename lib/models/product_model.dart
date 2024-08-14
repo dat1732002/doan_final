@@ -7,7 +7,7 @@ class ProductModel {
    String imageUrl;
    List<String> favoriteUserIds;
    Map<String, String> comments;
-   List<String> availableSizes;
+   List<Map<String,int>> availableSizes;
 
   ProductModel({
     required this.id,
@@ -46,7 +46,7 @@ class ProductModel {
       imageUrl: json['imageUrl'] as String,
       favoriteUserIds: List<String>.from(json['favoriteUserIds'] ?? []),
       comments: Map<String, String>.from(json['comments'] ?? {}),
-      availableSizes: List<String>.from(json['availableSizes'] ?? []),
+      availableSizes: List<Map<String,int>>.from(json['availableSizes'] ?? []),
     );
   }
 
