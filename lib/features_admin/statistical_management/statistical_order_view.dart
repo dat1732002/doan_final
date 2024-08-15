@@ -29,6 +29,13 @@ class StatisticalOrderView extends HookWidget {
     int getPendingOrdersCount() {
       return orders.value.where((order) => order.status == 'pending').length;
     }
+    int getSuccessOrdersCount() {
+      return orders.value.where((order) => order.status == 'Success').length;
+    }
+
+    int getFailOrdersCount() {
+      return orders.value.where((order) => order.status == 'Fail').length;
+    }
 
     double getTotalExpectedRevenue() {
       return orders.value
@@ -38,16 +45,24 @@ class StatisticalOrderView extends HookWidget {
     }
 
     int getTotalShoesSold() {
-      int total = 0;
-      for (var order in orders.value) {
-        total += order.items.length;
-      }
-      return total;
+      return orders.value
+          .where((order) =>
+      order.status == 'Accepted' || order.status == 'pending'||order.status == 'Success')
+          .fold(0, (sum, order) => sum + order.items.length);
     }
     int getTotalShoesSoldAccepted() {
       int total = 0;
       for (var order in orders.value) {
-        if (order.status == 'Accepted' ) {
+        if (order.status == 'Success' ) {
+          total += order.items.length;
+        }
+      }
+      return total;
+    }
+    int getTotalShoesSoldFail() {
+      int total = 0;
+      for (var order in orders.value) {
+        if (order.status == 'Fail' ) {
           total += order.items.length;
         }
       }
@@ -56,7 +71,7 @@ class StatisticalOrderView extends HookWidget {
 
     double getActualRevenue() {
       return orders.value
-          .where((order) => order.status == 'Accepted')
+          .where((order) => order.status == 'Success')
           .fold(0, (sum, order) => sum + order.totalAmount);
     }
 
@@ -95,24 +110,50 @@ class StatisticalOrderView extends HookWidget {
                       ),
                     ),
                     SizedBox(height: 16.h),
-                    Row(
+                    Column(
                       children: [
-                        Expanded(
-                          child: StatBox(
-                            title: 'Đã xác nhận',
-                            value: getAcceptedOrdersCount().toString(),
-                            color: Colors.green,
-                            icon: Icons.check_circle,
-                          ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: StatBox(
+                                title: 'Đã xác nhận',
+                                value: getAcceptedOrdersCount().toString(),
+                                color: Colors.blue,
+                                icon: Icons.check_circle,
+                              ),
+                            ),
+                            SizedBox(width: 5.w),
+                            Expanded(
+                              child: StatBox(
+                                title: 'Chờ xác nhận',
+                                value: getPendingOrdersCount().toString(),
+                                color: Colors.orange,
+                                icon: Icons.timer,
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(width: 5.w),
-                        Expanded(
-                          child: StatBox(
-                            title: 'Chờ xác nhận',
-                            value: getPendingOrdersCount().toString(),
-                            color: Colors.orange,
-                            icon: Icons.timer,
-                          ),
+                        const SizedBox(height: 10,),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: StatBox(
+                                title: 'Thành công',
+                                value: getSuccessOrdersCount().toString(),
+                                color: Colors.green,
+                                icon: Icons.check_circle,
+                              ),
+                            ),
+                            SizedBox(width: 5.w),
+                            Expanded(
+                              child: StatBox(
+                                title: 'Thất bại',
+                                value: getFailOrdersCount().toString(),
+                                color: Colors.red,
+                                icon: Icons.cancel,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -182,6 +223,24 @@ class StatisticalOrderView extends HookWidget {
                       SizedBox(height: 8.h),
                       Text(
                         '${getTotalShoesSoldAccepted()}',
+                        style: TextStyle(
+                          fontSize: 24.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: 16.h),
+                      Text(
+                        'Số sản phẩm hoàn trả',
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: 8.h),
+                      Text(
+                        '${getTotalShoesSoldFail()}',
                         style: TextStyle(
                           fontSize: 24.sp,
                           fontWeight: FontWeight.bold,

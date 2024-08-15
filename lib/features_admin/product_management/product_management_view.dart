@@ -384,6 +384,17 @@ class ProductManagementView extends HookWidget {
     final productService = ProductService();
     String? selectedCategory;
 
+    // Khởi tạo các TextEditingController cho các size
+    final sizeControllers = {
+      '38': TextEditingController(text: product?.sizes['38']?.toString() ?? ''),
+      '39': TextEditingController(text: product?.sizes['39']?.toString() ?? ''),
+      '40': TextEditingController(text: product?.sizes['40']?.toString() ?? ''),
+      '41': TextEditingController(text: product?.sizes['41']?.toString() ?? ''),
+      '42': TextEditingController(text: product?.sizes['42']?.toString() ?? ''),
+      '43': TextEditingController(text: product?.sizes['43']?.toString() ?? ''),
+      '44': TextEditingController(text: product?.sizes['44']?.toString() ?? ''),
+    };
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -393,24 +404,27 @@ class ProductManagementView extends HookWidget {
           ),
           backgroundColor: Colors.white,
           titlePadding: EdgeInsets.zero,
-          contentPadding: EdgeInsets.all(10),
+          contentPadding: EdgeInsets.only(left: 10,right: 10),
           actionsAlignment: MainAxisAlignment.center,
           title: Container(
             height: 40,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.only( topRight:  Radius.circular(15),topLeft: Radius.circular(15)),
+              borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(15), topLeft: Radius.circular(15)),
               color: ColorUtils.primaryColor,
             ),
             child: Text(
               product == null ? 'Thêm sản phẩm' : 'Sửa sản phẩm',
-              style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white,fontSize: 20),
+              style: TextStyle(
+                  fontWeight: FontWeight.bold, color: Colors.white, fontSize: 20),
             ),
           ),
           content: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                SizedBox(height: 10),
                 TextField(
                   controller: nameController,
                   decoration: InputDecoration(
@@ -458,7 +472,7 @@ class ProductManagementView extends HookWidget {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    suffix: Text('USD')
+                    suffix: Text('USD'),
                   ),
                   keyboardType: TextInputType.number,
                 ),
@@ -482,10 +496,12 @@ class ProductManagementView extends HookWidget {
                     InkWell(
                       onTap: () async {
                         final ImagePicker picker = ImagePicker();
-                        final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+                        final XFile? image =
+                        await picker.pickImage(source: ImageSource.gallery);
                         if (image != null) {
                           selectedImage = File(image.path);
-                          String imageUrl = await productService.uploadImage(selectedImage!);
+                          String imageUrl =
+                          await productService.uploadImage(selectedImage!);
                           imageUrlController.text = imageUrl;
                         }
                       },
@@ -510,6 +526,27 @@ class ProductManagementView extends HookWidget {
                 )
                     : Container(),
                 SizedBox(height: 10),
+
+                // Thêm các trường nhập số lượng cho từng size
+                Text('Số lượng theo size'),
+                SizedBox(height: 10),
+                Column(
+                  children: sizeControllers.entries.map((entry) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5.0),
+                      child: TextField(
+                        controller: entry.value,
+                        decoration: InputDecoration(
+                          labelText: 'Size ${entry.key}',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        keyboardType: TextInputType.number,
+                      ),
+                    );
+                  }).toList(),
+                ),
               ],
             ),
           ),
@@ -532,6 +569,16 @@ class ProductManagementView extends HookWidget {
             ),
             InkWell(
               onTap: () async {
+                final sizeQuantities = {
+                  '38': int.tryParse(sizeControllers['38']?.text ?? '') ?? 0,
+                  '39': int.tryParse(sizeControllers['39']?.text ?? '') ?? 0,
+                  '40': int.tryParse(sizeControllers['40']?.text ?? '') ?? 0,
+                  '41': int.tryParse(sizeControllers['41']?.text ?? '') ?? 0,
+                  '42': int.tryParse(sizeControllers['42']?.text ?? '') ?? 0,
+                  '43': int.tryParse(sizeControllers['43']?.text ?? '') ?? 0,
+                  '44': int.tryParse(sizeControllers['44']?.text ?? '') ?? 0,
+                };
+
                 if (product == null) {
                   final newProduct = ProductModel(
                     id: '',
@@ -540,6 +587,7 @@ class ProductManagementView extends HookWidget {
                     description: descriptionController.text,
                     price: double.tryParse(priceController.text) ?? 0.0,
                     imageUrl: imageUrlController.text,
+                    sizes: sizeQuantities,
                   );
                   await productService.createProduct(newProduct);
                 } else {
@@ -550,19 +598,21 @@ class ProductManagementView extends HookWidget {
                     description: descriptionController.text,
                     price: double.tryParse(priceController.text) ?? 0.0,
                     imageUrl: imageUrlController.text,
+                    sizes: sizeQuantities,
                   );
                   await productService.updateProduct(updatedProduct);
                 }
                 refresh.value++;
                 Navigator.of(context).pop();
               },
-              child:  Container(
+              child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 decoration: BoxDecoration(
                   border: Border.all(color: ColorUtils.primaryColor),
                   borderRadius: BorderRadius.circular(5),
                 ),
-                child: Text(product == null ? 'Thêm' : 'Cập nhật',
+                child: Text(
+                  product == null ? 'Thêm' : 'Cập nhật',
                   style: TextStyle(color: ColorUtils.primaryColor),
                 ),
               ),
@@ -572,6 +622,7 @@ class ProductManagementView extends HookWidget {
       },
     );
   }
+
 
   void _showCategoryManagementDialog(
       BuildContext context,

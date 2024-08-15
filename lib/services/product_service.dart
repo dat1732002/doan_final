@@ -2,14 +2,13 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecommerce_flutter/models/product_model.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 
 class ProductService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
-  final List<String> defaultSizes = ['38', '39', '40', '41', '42', '43', '44'];
   Future<void> createProduct(ProductModel product) async {
-    List<String> sizes =
-        product.availableSizes.isEmpty ? defaultSizes : product.availableSizes;
+
     try {
       await _firestore.collection('products').add({
         'name': product.name,
@@ -18,7 +17,7 @@ class ProductService {
         'price': product.price,
         'imageUrl': product.imageUrl,
         'favoriteUserIds': [],
-        'availableSizes': sizes,
+        'sizes': product.sizes, // Thêm trường này
       });
     } catch (e) {
       throw Exception('Error creating product: $e');
@@ -30,7 +29,15 @@ class ProductService {
       await _firestore
           .collection('products')
           .doc(product.id)
-          .update(product.toJson());
+          .update({
+        'name': product.name,
+        'category': product.category,
+        'description': product.description,
+        'price': product.price,
+        'imageUrl': product.imageUrl,
+        'favoriteUserIds': [],
+        'sizes': product.sizes, // Thêm trường này
+      });
     } catch (e) {
       throw Exception('Error updating product: $e');
     }
@@ -50,6 +57,12 @@ class ProductService {
           await _firestore.collection('products').get();
       return querySnapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        Map<String, int> sizes = Map<String, int>.from(data['sizes'] ?? {});
+
+        var sortedSizes = Map.fromEntries(
+          sizes.entries.toList()
+            ..sort((e1, e2) => int.parse(e1.key).compareTo(int.parse(e2.key))),
+        );
         return ProductModel(
           id: doc.id,
           name: data['name'],
@@ -58,14 +71,23 @@ class ProductService {
           price: data['price'],
           imageUrl: data['imageUrl'],
           favoriteUserIds: List<String>.from(data['favoriteUserIds'] ?? []),
-          availableSizes: List<String>.from(data['availableSizes'] ?? []),
+          sizes: sortedSizes,
         );
       }).toList();
     } catch (e) {
       throw Exception('Error fetching products: $e');
     }
   }
-
+  Future<void> updateProductStock(String productId, Map<String, int> updatedSizes) async {
+    try {
+      await _firestore
+          .collection('products')
+          .doc(productId)
+          .update({'sizes': updatedSizes});
+    } catch (e) {
+      throw Exception('Error updating product stock: $e');
+    }
+  }
   Future<void> toggleFavorite(String productId, String userId) async {
     try {
       DocumentReference productRef =
@@ -105,9 +127,15 @@ class ProductService {
   Future<ProductModel?> fetchProductDetails(String productId) async {
     try {
       DocumentSnapshot doc =
-          await _firestore.collection('products').doc(productId).get();
+      await _firestore.collection('products').doc(productId).get();
       if (doc.exists) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        Map<String, int> sizes = Map<String, int>.from(data['sizes'] ?? {});
+
+        var sortedSizes = Map.fromEntries(
+          sizes.entries.toList()
+            ..sort((e1, e2) => int.parse(e1.key).compareTo(int.parse(e2.key))),
+        );
         return ProductModel(
           id: doc.id,
           name: data['name'],
@@ -117,7 +145,7 @@ class ProductService {
           imageUrl: data['imageUrl'],
           favoriteUserIds: List<String>.from(data['favoriteUserIds'] ?? []),
           comments: Map<String, String>.from(data['comments'] ?? {}),
-          availableSizes: List<String>.from(data['availableSizes'] ?? []),
+          sizes: sortedSizes, // Thêm trường này
         );
       }
     } catch (e) {
@@ -152,4 +180,40 @@ class ProductService {
       throw Exception('Error adding or updating comment: $e');
     }
   }
+  Future<void> deleteComment(String productId, String userId, String comment) async {
+    try {
+      DocumentReference productRef =
+      _firestore.collection('products').doc(productId);
+
+      await _firestore.runTransaction((transaction) async {
+        DocumentSnapshot productSnapshot = await transaction.get(productRef);
+
+        if (productSnapshot.exists) {
+          Map<String, dynamic> data =
+          productSnapshot.data() as Map<String, dynamic>;
+          Map<String, String> comments =
+          Map<String, String>.from(data['comments'] ?? {});
+
+          String? keyToDelete;
+          comments.forEach((key, value) {
+            if (key.startsWith(userId) && value == comment) {
+              keyToDelete = key;
+            }
+          });
+
+          if (keyToDelete != null) {
+            comments.remove(keyToDelete);
+            transaction.update(productRef, {'comments': comments});
+          } else {
+            throw Exception('Comment not found');
+          }
+        } else {
+          throw Exception('Product not found');
+        }
+      });
+    } catch (e) {
+      throw Exception('Error deleting comment: $e');
+    }
+  }
+
 }

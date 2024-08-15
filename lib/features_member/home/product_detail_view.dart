@@ -11,7 +11,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class ProductDetailView extends HookWidget {
   final ProductModel product;
   final bool isAdmin;
-  const ProductDetailView({Key? key, required this.product,required this.isAdmin}) : super(key: key);
+
+  const ProductDetailView({Key? key, required this.product, required this.isAdmin})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +32,7 @@ class ProductDetailView extends HookWidget {
         currentUserId.value = userId;
 
         ProductModel? latestProduct =
-            await productService.fetchProductDetails(product.id);
+        await productService.fetchProductDetails(product.id);
         if (latestProduct != null) {
           updatedProduct.value = latestProduct;
         }
@@ -46,10 +48,10 @@ class ProductDetailView extends HookWidget {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: ColorUtils.primaryColor,
-        title: Text('Chi tiết sản phẩm',style: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.w600
-        ),),
+        title: Text(
+          'Chi tiết sản phẩm',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+        ),
         centerTitle: true,
         leading: InkWell(
           onTap: () {
@@ -64,65 +66,91 @@ class ProductDetailView extends HookWidget {
       body: isLoading.value
           ? Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.all(10.0),
-                child: Column(
+        child: Padding(
+          padding: EdgeInsets.all(10.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                child: Image.network(
+                  product.imageUrl,
+                  width: double.infinity,
+                  height: 200.h,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              SizedBox(height: 16.h),
+              Text(
+                product.name,
+                style: TextStyle(
+                    fontSize: 24.sp, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                '${product.price} USD',
+                style: TextStyle(fontSize: 20.sp, color: Colors.green),
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                product.description,
+                style: TextStyle(
+                    fontSize: 16.sp, fontStyle: FontStyle.italic),
+              ),
+              if (!isAdmin)
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                      child: Image.network(
-                        product.imageUrl,
-                        width: double.infinity,
-                        height: 200.h,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    SizedBox(height: 16.h),
-                    Text(
-                      product.name,
-                      style: TextStyle(
-                          fontSize: 24.sp, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 8.h),
-                    Text(
-                      '${product.price} USD',
-                      style: TextStyle(fontSize: 20.sp, color: Colors.green),
-                    ),
-                    SizedBox(height: 8.h),
-                    Text(
-                      product.description,
-                      style: TextStyle(fontSize: 16.sp,
-                      fontStyle: FontStyle.italic),
-                    ),
-                    if(!isAdmin)
-                      Row(
+                    Row(
                       children: [
-                        Text('Số lượng: ', style: TextStyle(fontSize: 16.sp,fontWeight: FontWeight.w500)),
+                        Text('Số lượng: ',
+                            style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w500)),
                         IconButton(
-                          icon: Icon(Icons.remove,color: Colors.red,),
-                          onPressed: () {
-                            if (quantity.value > 1) {
-                              quantity.value--;
-                            }
-                          },
+                          icon: Icon(
+                            Icons.remove,
+                            color: selectedSize.value != null &&
+                                quantity.value > 1
+                                ? Colors.red
+                                : Colors.grey,
+                          ),
+                          onPressed: selectedSize.value != null &&
+                              quantity.value > 1
+                              ? () {
+                            quantity.value--;
+                          }
+                              : null,
                         ),
                         Text('${quantity.value}'),
                         IconButton(
-                          icon: Icon(Icons.add,color: Colors.green,),
-                          onPressed: () {
+                          icon: Icon(
+                            Icons.add,
+                            color: selectedSize.value != null &&
+                                quantity.value <
+                                    updatedProduct.value
+                                        .sizes[
+                                    selectedSize.value]!
+                                ? Colors.green
+                                : Colors.grey,
+                          ),
+                          onPressed: selectedSize.value != null &&
+                              quantity.value <
+                                  updatedProduct.value
+                                      .sizes[
+                                  selectedSize.value]!
+                              ? () {
                             quantity.value++;
-                          },
+                          }
+                              : null,
                         ),
                       ],
                     ),
-                    if(!isAdmin)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         InkWell(
-                          onTap:selectedSize.value != null
-                              ? () async {
+                          onTap: selectedSize.value != null ? () async {
                             final cartItem = CartItemModel(
                               productId: product.id,
                               quantity: quantity.value,
@@ -131,23 +159,42 @@ class ProductDetailView extends HookWidget {
                               price: product.price,
                               size: selectedSize.value!,
                             );
+
                             await cartService.addOrUpdateCartItem(
                                 currentUserId.value, cartItem);
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text('Đã thêm vào giỏ hàng!'),
-                            ));
-                          }
-                              : null,
+
+                            final newStock =
+                                updatedProduct.value.sizes[
+                                selectedSize.value]! -
+                                    quantity.value;
+
+                            final updatedSize =
+                            Map<String, int>.from(
+                                updatedProduct.value.sizes)
+                              ..update(
+                                  selectedSize.value!,
+                                      (value) => newStock);
+
+                            await productService.updateProductStock(
+                                product.id, updatedSize);
+                            updatedProduct.value = updatedProduct.value
+                                .copyWith(sizes: updatedSize);
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    content:
+                                    Text('Đã thêm vào giỏ hàng!')));
+                          } : null,
                           child: Container(
                             padding: EdgeInsets.all(8),
                             decoration: BoxDecoration(
                                 color: Colors.green,
                                 borderRadius: BorderRadius.circular(30),
-                                border: Border.all(color: Colors.black12)
+                                border: Border.all(color: Colors.black12)),
+                            child: Text(
+                              'Thêm vào giỏ hàng',
+                              style: TextStyle(color: Colors.white),
                             ),
-                            child: Text('Thêm vào giỏ hàng',style: TextStyle(
-                                color: Colors.white
-                            ),),
                           ),
                         ),
                         Container(
@@ -156,41 +203,116 @@ class ProductDetailView extends HookWidget {
                             border: Border.all(color: Colors.black12),
                           ),
                           padding: EdgeInsets.only(left: 10, right: 6),
+
                           child: DropdownButton<String>(
                             value: selectedSize.value,
                             hint: Text('Size'),
                             isExpanded: true,
-                            underline: SizedBox.shrink(), // This removes the underline
-                            items: updatedProduct.value.availableSizes.map((String size) {
+                            underline: SizedBox.shrink(),
+                            items: updatedProduct.value.sizes.entries
+                                .map((entry) {
+                              bool isOutOfStock = entry.value <= 0;
                               return DropdownMenuItem<String>(
-                                value: size,
-                                child: Text(size),
+                                value: entry.key,
+                                child: Text(
+                                  '${entry.key} ${isOutOfStock ? "(Hết hàng)" : ""}',
+                                  style: TextStyle(
+                                    color: isOutOfStock
+                                        ? Colors.grey
+                                        : Colors.black,
+                                  ),
+                                ),
+                                enabled: !isOutOfStock,
                               );
                             }).toList(),
                             onChanged: (String? newValue) {
-                              selectedSize.value = newValue;
+                              if (newValue != null) {
+                                selectedSize.value = newValue;
+                                quantity.value = 1; // Reset quantity to 1 when size changes
+                              }
                             },
                           ),
                         ),
-
                       ],
                     ),
-                    SizedBox(height: 16.h),
-                    Text(
-                      'Bình luận',
-                      style: TextStyle(
-                          fontSize: 20.sp, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 8.h),
-                    CommentsList(
-                      comments: updatedProduct.value.commentsList,
-                      userService: userService,
-                    ),
-                    SizedBox(height: 16.h),
                   ],
                 ),
+              if (isAdmin)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 16.h),
+                    Text(
+                      'Quản lý size và số lượng',
+                      style: TextStyle(
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 8.h),
+                    Table(
+                      border: TableBorder.all(color: Colors.black12),
+                      children: [
+                        TableRow(children: [
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('Size',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold)),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('Số lượng',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold)),
+                          ),
+                        ]),
+                        ...updatedProduct.value.sizes.entries.map(
+                              (entry) {
+                            return TableRow(children: [
+                              Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text(entry.key),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text(entry.value.toString()),
+                              ),
+                            ]);
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              SizedBox(height: 16.h),
+              Text(
+                'Bình luận',
+                style: TextStyle(
+                    fontSize: 20.sp, fontWeight: FontWeight.bold),
               ),
-            ),
+              SizedBox(height: 8.h),
+              CommentsList(
+                comments: updatedProduct.value.commentsList,
+                userService: userService,
+                productService: productService,
+                productId: updatedProduct.value.id,
+                isAdmin: isAdmin,
+                onCommentDeleted: (deletedComment) {
+                  final updatedComments =
+                  Map<String, String>.from(
+                      updatedProduct.value.comments);
+                  updatedComments.removeWhere((key, value) =>
+                  key == deletedComment.userId &&
+                      value == deletedComment.text);
+                  updatedProduct.value = updatedProduct.value
+                      .copyWith(comments: updatedComments);
+                },
+              ),
+              SizedBox(height: 16.h),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -198,50 +320,94 @@ class ProductDetailView extends HookWidget {
 class CommentsList extends HookWidget {
   final List<Comment> comments;
   final UserService userService;
+  final ProductService productService;
+  final String productId;
+  final bool isAdmin;
+  final Function(Comment) onCommentDeleted;
 
   const CommentsList(
-      {Key? key, required this.comments, required this.userService})
+      {Key? key,
+        required this.comments,
+        required this.userService,
+        required this.productService,
+        required this.productId,
+        required this.isAdmin,
+        required this.onCommentDeleted})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return comments.isEmpty
         ? Text('Chưa có bình luận nào.',
-            style: TextStyle(fontStyle: FontStyle.italic))
+        style: TextStyle(fontStyle: FontStyle.italic))
         : ListView.builder(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: comments.length,
-            itemBuilder: (context, index) {
-              return FutureBuilder<Map<String, dynamic>>(
-                future: userService.fetchUserDetails(comments[index].userId),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CommentTile(
-                        userName: 'Loading...',
-                        commentText: comments[index].text);
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      itemCount: comments.length,
+      itemBuilder: (context, index) {
+        return FutureBuilder<Map<String, dynamic>>(
+          future: userService.fetchUserDetails(comments[index].userId),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CommentTile(
+                userName: 'Loading...',
+                commentText: comments[index].text,
+                isAdmin: isAdmin,
+                onDelete: () async {
+                  if (isAdmin) {
+                    await productService.deleteComment(
+                        productId, comments[index].userId, comments[index].text);
+                    onCommentDeleted(comments[index]);
                   }
-                  if (snapshot.hasError) {
-                    return CommentTile(
-                        userName: 'Error loading user',
-                        commentText: comments[index].text);
-                  }
-                  String userName = snapshot.data?['name'] ?? 'Unknown User';
-                  return CommentTile(
-                      userName: userName, commentText: comments[index].text);
                 },
               );
-            },
-          );
+            }
+            if (snapshot.hasError) {
+              return CommentTile(
+                userName: 'Error loading user',
+                commentText: comments[index].text,
+                isAdmin: isAdmin,
+                onDelete: () async {
+                  if (isAdmin) {
+                    await productService.deleteComment(
+                        productId, comments[index].userId, comments[index].text);
+                    onCommentDeleted(comments[index]);
+                  }
+                },
+              );
+            }
+            String userName = snapshot.data?['name'] ?? 'Unknown User';
+            return CommentTile(
+              userName: userName,
+              commentText: comments[index].text,
+              isAdmin: isAdmin,
+              onDelete: () async {
+                if (isAdmin) {
+                  await productService.deleteComment(
+                      productId, comments[index].userId, comments[index].text);
+                  onCommentDeleted(comments[index]);
+                }
+              },
+            );
+          },
+        );
+      },
+    );
   }
 }
 
 class CommentTile extends StatelessWidget {
   final String userName;
   final String commentText;
+  final bool isAdmin;
+  final VoidCallback? onDelete;
 
   const CommentTile(
-      {Key? key, required this.userName, required this.commentText})
+      {Key? key,
+        required this.userName,
+        required this.commentText,
+        required this.isAdmin,
+        this.onDelete})
       : super(key: key);
 
   @override
@@ -250,18 +416,30 @@ class CommentTile extends StatelessWidget {
       margin: EdgeInsets.symmetric(vertical: 8.h, horizontal: 4.w),
       child: Padding(
         padding: EdgeInsets.all(12.r),
-        child: Column(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              userName,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    userName,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    commentText,
+                    style: TextStyle(fontSize: 14.sp),
+                  ),
+                ],
+              ),
             ),
-            SizedBox(height: 4.h),
-            Text(
-              commentText,
-              style: TextStyle(fontSize: 14.sp),
-            ),
+            if (isAdmin)
+              IconButton(
+                icon: Icon(Icons.delete, color: Colors.red),
+                onPressed: onDelete,
+              ),
           ],
         ),
       ),

@@ -1,13 +1,13 @@
 class ProductModel {
-   String id;
-   String name;
-   String category;
-   String description;
-   double price;
-   String imageUrl;
-   List<String> favoriteUserIds;
-   Map<String, String> comments;
-   List<String> availableSizes;
+  String id;
+  String name;
+  String category;
+  String description;
+  double price;
+  String imageUrl;
+  List<String> favoriteUserIds;
+  Map<String, String> comments;
+  Map<String, int> sizes;
 
   ProductModel({
     required this.id,
@@ -18,12 +18,39 @@ class ProductModel {
     required this.imageUrl,
     this.favoriteUserIds = const [],
     this.comments = const {},
-    this.availableSizes = const [],
+    this.sizes = const {},
   });
 
-  // Convert a ProductModel instance to a Map<String, dynamic> for JSON serialization
+  // Phương thức copyWith để tạo một bản sao của ProductModel với các giá trị được cập nhật
+  ProductModel copyWith({
+    String? id,
+    String? name,
+    String? category,
+    String? description,
+    double? price,
+    String? imageUrl,
+    List<String>? favoriteUserIds,
+    Map<String, String>? comments,
+    List<String>? availableSizes,
+    Map<String, int>? sizes,
+  }) {
+    return ProductModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      category: category ?? this.category,
+      description: description ?? this.description,
+      price: price ?? this.price,
+      imageUrl: imageUrl ?? this.imageUrl,
+      favoriteUserIds: favoriteUserIds ?? this.favoriteUserIds,
+      comments: comments ?? this.comments,
+      sizes: sizes ?? this.sizes,
+    );
+  }
+
+  // Chuyển đổi ProductModel thành Map<String, dynamic> để dùng trong JSON serialization
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'name': name,
       'category': category,
       'description': description,
@@ -31,11 +58,11 @@ class ProductModel {
       'imageUrl': imageUrl,
       'favoriteUserIds': favoriteUserIds,
       'comments': comments,
-      'availableSizes': availableSizes,
+      'size': sizes,
     };
   }
 
-  // Create a ProductModel instance from a Map<String, dynamic>
+  // Tạo một instance của ProductModel từ Map<String, dynamic>
   factory ProductModel.fromJson(String id, Map<String, dynamic> json) {
     return ProductModel(
       id: id,
@@ -46,29 +73,35 @@ class ProductModel {
       imageUrl: json['imageUrl'] as String,
       favoriteUserIds: List<String>.from(json['favoriteUserIds'] ?? []),
       comments: Map<String, String>.from(json['comments'] ?? {}),
-      availableSizes: List<String>.from(json['availableSizes'] ?? []),
+      sizes: Map<String, int>.from(json['size'] ?? {}),
     );
   }
 
-  // Convert comments map to a list of Comment objects
+  // Chuyển đổi map comments thành danh sách các đối tượng Comment
   List<Comment> get commentsList {
     return comments.entries.map(
           (entry) => Comment(userId: entry.key, text: entry.value),
     ).toList();
   }
+
+  // Chuyển đổi map size thành danh sách các đối tượng Size
+  List<Size> get sizeList {
+    return sizes.entries.map(
+          (entry) => Size(size: entry.key, quantity: entry.value),
+    ).toList();
+  }
 }
 
-// Assuming you have a Comment class defined like this
 class Comment {
-   String userId;
-   String text;
+  String userId;
+  String text;
 
   Comment({
     required this.userId,
     required this.text,
   });
 
-  // Convert a Comment instance to a Map<String, dynamic> for JSON serialization
+  // Chuyển đổi Comment thành Map<String, dynamic> để dùng trong JSON serialization
   Map<String, dynamic> toJson() {
     return {
       'userId': userId,
@@ -76,11 +109,37 @@ class Comment {
     };
   }
 
-  // Create a Comment instance from a Map<String, dynamic>
+  // Tạo một instance của Comment từ Map<String, dynamic>
   factory Comment.fromJson(Map<String, dynamic> json) {
     return Comment(
       userId: json['userId'] as String,
       text: json['text'] as String,
+    );
+  }
+}
+
+class Size {
+  String size;
+  int quantity;
+
+  Size({
+    required this.size,
+    required this.quantity,
+  });
+
+  // Chuyển đổi Size thành Map<String, dynamic> để dùng trong JSON serialization
+  Map<String, dynamic> toJson() {
+    return {
+      'size': size,
+      'quantity': quantity,
+    };
+  }
+
+  // Tạo một instance của Size từ Map<String, dynamic>
+  factory Size.fromJson(Map<String, dynamic> json) {
+    return Size(
+      size: json['size'] as String,
+      quantity: json['quantity'] as int,
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:ecommerce_flutter/models/order_model.dart';
+import 'package:ecommerce_flutter/services/order_service.dart';
 import 'package:ecommerce_flutter/services/product_service.dart';
 import 'package:ecommerce_flutter/utils/color_utils.dart';
 import 'package:flutter/material.dart';
@@ -65,7 +66,8 @@ class OrderDetailsView extends StatelessWidget {
                   .map((item) => _buildOrderItem(context, item, order))
                   .toList(),
             ),
-
+            SizedBox(height: 24.h),
+            if(order.status.toLowerCase()!='success'&&order.status.toLowerCase()!='fail') _buildActionButtons(context)
           ],
         ),
       ),
@@ -103,18 +105,25 @@ class OrderDetailsView extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: TextStyle(fontWeight: FontWeight.w500)),
-          Text(value.toLowerCase() == 'accepted'
+          Text(value.toLowerCase() == 'success'
               ? 'Thành công'
               : value.toLowerCase() == 'pending'
               ? 'Chờ xác nhận'
-              : value,
+              : value.toLowerCase() == 'accepted'
+              ?'Đã xác nhận'
+              :value.toLowerCase() == 'fail'
+              ?'Đã huỷ'
+              :value,
               style: TextStyle(
-                color: value.toLowerCase() == 'accepted'
-                    ? Colors.green
-                    : value.toLowerCase() == 'pending'
-                    ? Colors.red
-                    : Colors.black,
+                  color: value.toLowerCase() == 'success'
+                      ? Colors.green
+                      : value.toLowerCase() == 'pending'||value.toLowerCase() == 'fail'
+                      ? Colors.red
+                      : value.toLowerCase() == 'accepted'
+                      ? Colors.black
+                      : Colors.black
               )),
+
         ],
       ),
     );
@@ -124,7 +133,7 @@ class OrderDetailsView extends StatelessWidget {
       BuildContext context, OrderItem item, OrderModel order) {
     return GestureDetector(
       onTap: () {
-        if (order.status.toLowerCase() == 'accepted') {
+        if (order.status.toLowerCase() == 'success') {
           _showCommentDialog(context, item, order);
         }
       },
@@ -211,6 +220,77 @@ class OrderDetailsView extends StatelessWidget {
               Navigator.pop(context);
             },
             child: Text('Submit'),
+          ),
+        ],
+      ),
+    );
+  }
+  Widget _buildActionButtons(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+          onPressed: () => _showCancelDialog(context),
+          child: Text(
+            'Hủy',
+            style: TextStyle(color: ColorUtils.whiteColor),
+          ),
+        ),
+        if(order.status.toLowerCase()!='pending')ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+          onPressed: () => _showAcceptDialog(context),
+          child: Text(
+            'Xác nhận',
+            style: TextStyle(color: ColorUtils.whiteColor),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showCancelDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Hủy đơn hàng'),
+        content: Text('Bạn có chắc là muốn hủy đơn hàng này?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Không'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              await OrderService().updateOrderStatus(order.id!, 'Fail');
+              Navigator.pop(context);
+              Navigator.pop(context); // Close details view
+            },
+            child: Text('Có'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAcceptDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Xác nhận đã nhận hàng'),
+        content: Text('Bạn có chắc là muốn xác nhận đã nhận đơn hàng này?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Không'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              await OrderService().updateOrderStatus(order.id!, 'Success');
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+            child: Text('Có'),
           ),
         ],
       ),

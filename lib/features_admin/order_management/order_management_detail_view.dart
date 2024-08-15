@@ -67,7 +67,7 @@ class OrderManagementDetailsView extends StatelessWidget {
                   .toList(),
             ),
             SizedBox(height: 24.h),
-            if(order.status.toLowerCase()!='accepted') _buildActionButtons(context),
+            if(order.status.toLowerCase()=='pending') _buildActionButtons(context),
           ],
         ),
       ),
@@ -151,17 +151,23 @@ class OrderManagementDetailsView extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: TextStyle(fontWeight: FontWeight.w500)),
-          Text(value.toLowerCase() == 'accepted'
+          Text(value.toLowerCase() == 'success'
               ? 'Thành công'
               : value.toLowerCase() == 'pending'
               ? 'Chờ xác nhận'
-              : value,
+              : value.toLowerCase() == 'accepted'
+              ?'Đã xác nhận'
+              :value.toLowerCase() == 'fail'
+              ?'Thất bại'
+              :value,
               style: TextStyle(
-                color: value.toLowerCase() == 'accepted'
-                    ? Colors.green
-                    : value.toLowerCase() == 'pending'
-                    ? Colors.red
-                    : Colors.black,
+                  color: value.toLowerCase() == 'success'
+                      ? Colors.green
+                      : value.toLowerCase() == 'pending'||value.toLowerCase() == 'fail'
+                      ? Colors.red
+                      : value.toLowerCase() == 'accepted'
+                      ? Colors.black
+                      : Colors.black
               )),
         ],
       ),

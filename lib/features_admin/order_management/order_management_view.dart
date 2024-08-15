@@ -95,15 +95,24 @@ class OrderManagementView extends HookWidget {
                                     fontSize: 14.sp,
                                   ),
                                 ),
-                                Text(
-                                  '${order.status}',
-                                  style: TextStyle(
-                                    color: order.status.toLowerCase() == 'accepted'
-                                        ? Colors.green
-                                        : Colors.red,
-                                    fontSize: 14.sp,
-                                  ),
-                                ),
+                                Text(order.status.toLowerCase() == 'success'
+                                    ? 'Thành công'
+                                    : order.status.toLowerCase() == 'pending'
+                                    ? 'Chờ xác nhận'
+                                    : order.status.toLowerCase() == 'accepted'
+                                    ?'Đã xác nhận'
+                                    :order.status.toLowerCase() == 'fail'
+                                    ?'Thất bại'
+                                    :order.status,
+                                    style: TextStyle(
+                                      color: order.status.toLowerCase() == 'success'
+                                          ? Colors.green
+                                          : order.status.toLowerCase() == 'pending'||order.status.toLowerCase() == 'fail'
+                                          ? Colors.red
+                                          : order.status.toLowerCase() == 'accepted'
+                                          ? Colors.black
+                                          : Colors.grey
+                                    )),
                               ],
                             ),
                           ],

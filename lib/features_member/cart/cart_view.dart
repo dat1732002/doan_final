@@ -70,27 +70,50 @@ class CartView extends HookWidget {
 
     void updateQuantity(CartItemModel item, int newQuantity) {
       final index = cartItems.value.indexWhere(
-          (i) => i.productId == item.productId && i.size == item.size);
+              (i) => i.productId == item.productId && i.size == item.size);
       if (index != -1) {
-        final updatedItem = CartItemModel(
-          productId: item.productId,
-          quantity: newQuantity,
-          price: item.price,
-          productName: item.productName,
-          imageUrl: item.imageUrl,
-          size: item.size,
-        );
-        cartItems.value[index] = updatedItem;
-        cartItems.value = List.from(cartItems.value);
-        calculateTotalAmount();
+        productService.fetchProductDetails(item.productId).then((product) {
+          if (product != null) {
+            final availableQuantity = product.sizes[item.size] ?? 0;
 
-        updateSubject.add({
-          'productId': item.productId,
-          'size': item.size,
-          'quantity': newQuantity
+            if (newQuantity <= 0) {
+              cartService.removeFromCart(currentUserId, item.productId, item.size).then((_) {
+                cartItems.value.removeAt(index);
+                cartItems.value = List.from(cartItems.value);
+                calculateTotalAmount();
+              });
+            } else if (newQuantity <= availableQuantity) {
+              final updatedItem = CartItemModel(
+                productId: item.productId,
+                quantity: newQuantity,
+                price: item.price,
+                productName: item.productName,
+                imageUrl: item.imageUrl,
+                size: item.size,
+              );
+              cartItems.value[index] = updatedItem;
+              cartItems.value = List.from(cartItems.value);
+              calculateTotalAmount();
+
+              updateSubject.add({
+                'productId': item.productId,
+                'size': item.size,
+                'quantity': newQuantity
+              });
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text('Số lượng vượt quá số lượng trong kho'),
+              ));
+            }
+          }
+        }).catchError((e) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Lỗi khi lấy thông tin sản phẩm: $e'),
+          ));
         });
       }
     }
+
 
     if (isLoading.value) {
       return Scaffold(
