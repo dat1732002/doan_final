@@ -87,7 +87,7 @@ class OrderService {
   }
 
   Stream<List<OrderModel>> getAllOrders() {
-    return _firestore.collection('orders').snapshots().map((snapshot) {
+    return _firestore.collection('orders').orderBy('createdAt', descending: true).snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
         return OrderModel.fromJson(doc.data(), doc.id);
       }).toList();
